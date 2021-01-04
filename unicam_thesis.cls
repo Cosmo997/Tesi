@@ -199,8 +199,6 @@
 \setlength{\parskip}{0mm}
 
 \begin{center}
-  \includegraphics[width=15mm]{Immagini/stemma}\par%
-  \vspace{0.15cm}%
   {\rmfamily \Large \bfseries \@theuniversity \par}%
   \vspace{0.15cm}%
   \hrule%
@@ -209,9 +207,11 @@
   \vspace{0.15cm}%
   {\rmfamily \large Corso di \@thecourse \par}%
   \vspace*{\stretch{7}}%
+  \includegraphics[width=25mm]{Immagini/stemma}\par%
+  \vspace{0.15cm}%
   {\rmfamily \LARGE \bfseries \@thetitle \par}%
   \vspace*{\stretch{7}}%
-  {Laureando \hfill Relatore \par}%
+  {Laureandi \hfill Relatore \par}%
   {\bfseries \large \@theauthor \hfill \@theadvisor \par}%
 \end{center}
 {\bfseries \small Matricola \@thematricola}%
