@@ -1,0 +1,60 @@
+\documentclass{unicam_thesis}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+%\usepackage[backend=bibtex]{biblatex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TESI DATI FRONTESPIZIO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{TITOLO \\ TITOLO }
+
+\university{Universit\`a degli Studi di Camerino}%
+\school{Scienze e Tecnologie}%
+\course{Laurea in Informatica (Classe L-31)}%
+
+
+\author{Autore Name}%
+\advisor{Relatore Name}%
+\coadvisor2{Correlatore Name}%
+\academicyear{2018/2019}%
+\matricola{000000}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FINE DATI FRONTESPIZIO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\theoremstyle{definition} \newtheorem{esempio}{Esempio}[chapter]
+\theoremstyle{definition}
+\newtheorem{definizione}{Definizione}[chapter] \theoremstyle{plain}
+\newtheorem{teorema}{Teorema}[chapter]
+
+\graphicspath{{Screenshot/},{Immagini/},{API/},{Source/}}
+\bibliography{biblio.bib}
+%\addbibresource{biblio.bib}
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\lstlistoflistings
+\listoffigures
+\listoftables
+
+\input{introduzione}
+\input{Capitolo1}
+\input{Capitolo2}
+\input{Capitolo7}
+
+
+\appendix
+%\input{schema_elettrico}
+%\input{Appendix1}
+%\input{Appendix2}
+
+\printbibliography
+
+\printindex
+
+\include{ringraziamenti}
+
+\end{document}
