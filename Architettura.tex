@@ -48,6 +48,7 @@ Il componente che dipenderá da questo determinato servizio, chiamato appunto Di
 Il core del servizio implementato è rappresentato dalla Classe DialService, essa infatti si occupa di inizializzare il servizio e rendere disponibile la comunicazione bi-direzionale tra il lato Web e quello UWP.\\
 
 In particolare si occupa di recuperare l'oggetto C\# iniettato a sua volta dentro l'oggetto window della pagina web, con visibilitá globale.\\
+
 \vspace{1.0cm}
 \begin{lstlisting}[caption={Recupero oggetto C\#},style=javaScriptCode]
 	this.dial = (window as any).dial;
@@ -55,5 +56,150 @@ In particolare si occupa di recuperare l'oggetto C\# iniettato a sua volta dentr
 \vspace{1.0cm}
 
 L'oggetto dial viene poi inserito per questioni di sicurezza in una classe DialProxy, la quale implementa a sua volta l'interfaccia da noi sviluppata DialBackendBridge, nella quale sono presenti tutte le funzionalitá dell'oggetto "dial", richiamabili quindi da Web.
+
+\subsection{DialProxy}
+
+Al fine di aggiungere un livello di sicurezza sull’oggetto iniettato e sul suo successivo utilizzo, abbiamo deciso di implementare una classe chiamata DialProxy con la responsabilitá di wrappare l’oggetto e quindi di intercettare le chiamate fatte su di esso.\\
+
+La classe DialProxy prende quindi in ingresso nel suo costruttore un oggetto di tipo DialBackendBridge, che rappresenta l'oggetto iniettato, e come secondo parametro il servizio DialService per poter accedere rapidamente alle proprietá del servizio e poter effettuare determinati controlli prima di richiamare un metodo.\\
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Wrapping oggetto recuperato},style=javaScriptCode]
+	this.dialProxy = new DialProxy(this.dial, this);
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\newpage
+\subsection{DialBackendBridge}
+
+DialBeckendBridge rappresenta l'interfaccia contenente la dichiarazione dei metodi implementati nella classe DialController dell'applicazione UWP.\\
+In questo modo, tramite l'oggetto dial iniettato, sará possibile richiamare a RunTime i metodi dichiarati nel C\# attraverso il Web.\\
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Interfaccia DialBackendBridge},style=javaScriptCode]
+export interface DialBackednBridge{
+		
+	getProductId(): string;
+	
+	setMenu(arrayOfItem: any[]): void;
+	
+	clearMenu(): void;
+	
+	deleteItem(tag: string): void;
+	
+	addItem(item: any): void;
+	
+	createDialMenuItem(tag: string, displayText: string, icon: string): any;
+	
+	setDefaultItem(defaultItems: string[]): void;
+	
+	manualInvoke(tag: string): void;		
+
+}		
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\newpage
+\subsection{DialFrontendBridge}
+
+Per rendere questa comunicazione bi-direzionale, abbiamo creato una classe DialFrontendBridge con la responsabilitá di rendere visibili dei metodi all'interno dell'oggetto window e quindi richiamabili tramite script dall'applicazione UWP.\\
+
+L'invocazione di questi metodi comporta la successiva emissione di un determinato evento a coloro che vi si sottoscrivono, con la possibilitá del passaggio di parametri di tipo stringa.\\
+
+Tramite l'utilizzo degli EventEmitter messi a disposizione dal core di Angular e definiti come mostrato nel codice sottostante, la classe DialFrontendBridge permette all'utilizzatore del servizio di sottoscriversi a determinati eventi pubblici, che quando richiamati emettono un determinato valore. RIFERIMENTO A CODICE \\
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={EventEmitter esposti da DialFrontendBridge},style=javaScriptCode]
+public onRotationEvent = new EventEmitter<{tag: string, degree: string}>();
+public onPressedRotationEvent = new EventEmitter<{tag: string, degree: string}>();
+public onClickEvent = new EventEmitter<string>();
+public onInvokeEvent = new EventEmitter<string>();
+public onScreenContactStartedEvent = new EventEmitter<{x: string, y: string}>();
+public onScreenContactContinuedEvent = new EventEmitter<{x: string, y: string}>();
+public onScreenContactEndedEvent = new EventEmitter();
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Affinché questi metodi possano essere richiamati tramite script dall'applicazione UWP é stato necessario inserire l'istanza della classe all'interno dell'oggetto window, cosi da renderlo visibile e utilizzabile dall'esterno.\\
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Inserimento classe DialFrontendbridge in window },style=javaScriptCode]
+(windowa as any).DialFrontendBridge = this.dialFrontendbridge;
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\newpage
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Metodi esposti da DialFrontendBridge},style=javaScriptCode]
+   /**
+     * Metodo richiamato da UWP che notifica la rotazione del Microsoft Dial.
+     * @param tag Identificatore dell'elemento che ha eseguito la rotazione
+     * @param degree Gradi della rotazione
+     */
+    public RotationEvent(tag: string, degree: string): string{
+        this.onRotationEvent.emit({tag, degree});
+        return degree;
+    }
+
+    /**
+     * Metodo richiamato da UWP che notifica la rotazione de
+     * l Microsoft Dial con il Dial premuto.
+     * @param tag Identificatore dell'elemento che ha eseguito la rotazione
+     * @param degree Gradi della rotazione
+     */
+    public PressedRotationEvent(tag: string, degree: string): string{
+        this.onPressedRotationEvent.emit({tag, degree});
+        return degree;
+    }
+
+    /**
+     * Metodo richiamato dall'UWP che notifica la pressione del del Microsoft Dial.
+     * @param tag Identificatore dell'elemeto che ha eseguito il click sul Dial.
+     */
+    public ClickEvent(tag: string){
+            this.onClickEvent.emit(tag);
+    }
+
+    /**
+     * Metodo richiamato dall'UWP che notifica l'invocazione di un elemento di Menu.
+     * @param tag Identificatore del MenuItem che ha eseguito l'invoke.
+     */
+    public InvokeEvent(tag: string){
+        this.onInvokeEvent.emit(tag);
+    }
+
+    /**
+     * Metodo richiamato dall'UWP che notifica il contatto del 
+     * dispositivo Dial con lo schermo nel punto con coordinate x e y.
+     * @param x Coordinata x della posizione
+     * @param y Coordinata y della posizione
+     */
+    public ScreenContactStartedEvent(x: string, y: string){
+        this.onScreenContactStartedEvent.emit({x, y});
+    }
+
+    /**
+     * Metodo richiamato dall'UWP che notifica lo spostamento del 
+     * dispositivo Dial sullo schermo nel punto con coordinate x e y.
+     * @param x Coordinata x della posizione
+     * @param y Coordinata y della posizione
+     */
+    public ScreenContactContinuedEvent(x: string, y: string){
+        this.onScreenContactContinuedEvent.emit({x, y});
+    }
+
+    /**
+     * Metodo richiamato dall'UWP che norifica 
+     * quando il Dial viene rimosso dallo schermo
+     */
+    public ScreenContactEndedEvent(){
+        this.onScreenContactEndedEvent.emit();
+    }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\subsection{DialMenuLoader}
+
+\subsection{Widget}
  
 \section{Applicazione UWP}
