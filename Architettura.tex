@@ -1,9 +1,59 @@
 \chapter{Architettura}
-\label{chap:Capitolo1}
+\label{chap:arch}
 
-Lorem ipsum dolor sit amet, consectetur adipisci elit, sed do eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullamco laboriosam, nisi ut aliquid ex ea commodi consequatur. Duis aute irure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+In questo capitolo verrá esposta l'architettura finale dell'applicativo sviluppato che permette la comunicazione tra il Surface Dial e la pagina web.\\
 
-\section{Sezione Esempio}
+Il progetto si presenta suddiviso in due parti ben distinte:
+\begin{itemize}
+\item \textbf{Servizio Angular}.
+\item \textbf{Applicazione UWP} (Universal Windows Plaform).
+\end{itemize}
+
+\section{Servizio Angular}
+In Angular, i Servizi rappresentano un tassello fondamentale per la realizzazione di un'applicazione. Un servizio è solitamente rappresentato da una classe indipendente dalla View che viene definita per svolgere un compito ben preciso ed effettuare delle operazioni strettamente correlate tenendo in mente il principio di singola responsabilità.\\
+È possibile definire più servizi all'interno di un'applicazione, ognuno dei quali si occupa di portare a termine un determinato incarico incrementando la modularitá del progetto, inoltre un servizio puó a sua volta dipendere da altri servizi, che vengono definiti nel costruttore del servizio stesso.\\
+
+Avvalendosi di Angular CLI, possiamo creare un Servizio tramite il comando:
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Esempio creazione servizio},style=javaScriptCode]
+	ng generate service <nome-del-servizio> <flag-opzionali>
+\end{lstlisting} 
+\vspace{1.0cm}
+Una volta creati, i servizi possono essere iniettati all'interno di uno o più componenti grazie al meccanismo di \emph{Dependency Injection}.\\
+
+Per poter utilizzare un servizio da noi definito, dobbiamo registrarlo con uno degli Injector presenti in Angular. Esiste infatti una gerarchia di Injector, che Angular provvede a creare, alla base dei quali c'è il cosiddetto Root Injector, che viene creato in fase di bootstrap dell’applicazione e i servizi registrati con quest’ultimo sono disponibili per tutta l’applicazione.\\
+
+Per ogni Injector esiste sempre una sola istanza di un determinato servizio, come specificato nella documentazione ufficiale:\\
+
+\emph{"Services are singletons within the scope of an injector. That is, there is at most one instance of a service in a given injector."}\\
+
+L’ Injector si occupa di creare le dipendenze e si serve di un Provider, un oggetto il quale indica all'Injector come ottenere o creare un'istanza di una dipendenza.
+Per ogni dipendenza che si vuole usare nell'applicazione si deve registrare un provider con un Injector, in modo che quest'ultimo possa poi utilizzare il provider per creare nuova istanza di quella dipendenza.
+
+\subsection{Singleton services}
+
+Per restare in linea con le direttive utilizzare dal gruppo Loccioni nello sviluppo dei loro servizi, abbiamo utilizzato il forRoot() pattern per l’injection del servizio nell’applicazione.\\
+
+Questo pattern permette di specificare un modulo personalizzato per il servizio, il quale contiene un metodo statico chiamato appunto forRoot() che restituisce un ModuleWithProvider parametrizzato al modulo del Servizio.\\
+
+Questo pattern permette di effettuare l’import del modulo nell’AppModule richiamando il metodo forRoot(), cosi da non dover appesantire il Provider del modulo iniziale e in linea di principio é bene utilizzarlo quando un provider prende in ingresso dei parametri, così da non dover specificarli ogni qualvolta il modulo venga utilizzato.
+
+\subsection{DialService}
+
+Lo scopo finale del servizio che abbiamo implementato é quello di poterlo utilizzare come ponte o intermediario tra il Surface Dial, che si interfaccia nativamente con l'applicazione UWP, la quale contiene una WebView con all'interno caricata una pagina custom Loccioni, e i componenti della View all'interno della pagina che intendono utilizzare il servizio.\\
+
+Il componente che dipenderá da questo determinato servizio, chiamato appunto DialService, potrá facilmente utilizzare le funzionalitá messe a disposizione dal Surface Dial e interpretare gli eventi intercettati a RunTime.\\
+
+Il core del servizio implementato è rappresentato dalla Classe DialService, essa infatti si occupa di inizializzare il servizio e rendere disponibile la comunicazione bi-direzionale tra il lato Web e quello UWP.\\
+
+In particolare si occupa di recuperare l'oggetto C\# iniettato a sua volta dentro l'oggetto window della pagina web, con visibilitá globale.\\
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Recupero oggetto C\#},style=javaScriptCode]
+	this.dial = (window as any).dial;
+\end{lstlisting} 
+\vspace{1.0cm}
+
+L'oggetto dial viene poi inserito per questioni di sicurezza in una classe DialProxy, la quale implementa a sua volta l'interfaccia da noi sviluppata DialBackendBridge, nella quale sono presenti tutte le funzionalitá dell'oggetto "dial", richiamabili quindi da Web.
  
- 
-\section{Sezione Esempio}
+\section{Applicazione UWP}
