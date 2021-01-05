@@ -1,0 +1,36 @@
+Documentazione Dial
+https://docs.microsoft.com/it-it/windows/uwp/design/input/windows-wheel-interactions
+
+Classe RadialController
+https://docs.microsoft.com/it-it/uwp/api/Windows.UI.Input.RadialController?view=winrt-19041
+
+Esempi Applicazione UWP Dial
+https://github.com/Microsoft/Windows-universal-samples/tree/master/Samples/RadialController
+
+Sonnino
+https://blogs.msmvps.com/bsonnino/2016/12/
+
+Progress Software Corporation. Modern UI made easy. url: https://www.
+telerik.com/.
+
+GitLab. 2020. url: https://it.wikipedia.org/wiki/GitLab.
+
+HTML. 2020. url: https://en.wikipedia.org/wiki/HTML.
+
+Loccioni. Loccioni. url: https://www.loccioni.com/it/misura/.
+
+[Micf] Microsoft. Visual Studio. url: https://visualstudio.microsoft.com/it/vs/
+community/.
+
+[Micg] Microsoft. Visual Studio Code. url: https://code.visualstudio.com/docs.
+
+[Npm] Npm (Software). url: https://it.wikipedia.org/wiki/Npm (software).
+
+[teaa] Angular team. Introduction to Angular concepts. url: https://angular.io/.
+
+[Typ] TypeScript. url: https://github.com/Microsoft/TypeScript.
+80
+
+
+
+
