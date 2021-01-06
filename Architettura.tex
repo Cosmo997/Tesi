@@ -45,9 +45,7 @@ Lo scopo finale del servizio che abbiamo implementato é quello di poterlo utili
 
 Il componente che dipenderá da questo determinato servizio, chiamato appunto DialService, potrá facilmente utilizzare le funzionalitá messe a disposizione dal Surface Dial e interpretare gli eventi intercettati a RunTime.\\
 
-Il core del servizio implementato è rappresentato dalla Classe DialService, essa infatti si occupa di inizializzare il servizio e rendere disponibile la comunicazione bi-direzionale tra il lato Web e quello UWP.\\
-
-In particolare si occupa di recuperare l'oggetto C\# iniettato a sua volta dentro l'oggetto window della pagina web, con visibilitá globale.\\
+Il core del servizio implementato è rappresentato dalla Classe DialService, essa infatti si occupa di inizializzare il servizio e rendere disponibile la comunicazione bi-direzionale tra il lato Web e quello UWP.In particolare si occupa di recuperare l'oggetto C\# iniettato a sua volta dentro l'oggetto window della pagina web, con visibilitá globale.\\
 
 \vspace{1.0cm}
 \begin{lstlisting}[caption={Recupero oggetto C\#},style=javaScriptCode]
@@ -200,6 +198,262 @@ Affinché questi metodi possano essere richiamati tramite script dall'applicazio
 
 \subsection{DialMenuLoader}
 
+Il secondo servizio implementato, chiamato DialMenuLoader é un perfetto esempio di come usufruire del servizio DialService all'interno di Componenti o Servizi.\\
+
+DialMenuLoader ha lo scopo di creare dinamicamente le voci di Menu da inserire nel dial e di definire per ciascuna voce il comportamento, che in questo caso rappresenta la navigazione tra le voci di menu di un ServerLayout Loccioni.\\
+
+Grazie al servizio DialService e a quello Router inseriti nel costruttore, questo sotto-servizio permette di sottoscriversi automaticamente agli eventi di navigazione della pagina e a quelli del dial, così da caricare le giuste voci del menu in base al livello in cui si trova, caricando la voce di menu Home solo se si "atterra" in un componente altrimenti quella Back per navigare il menu nel senso opposto.\\
+
+\begin{lstlisting}[caption={Metodo loadLevelMenuUp},style=javaScriptCode]
+    /**
+     * Carica un menu nel Dial e lo rende navigabile.
+     * @param menu Menu da caricare nel Dial.
+     */
+    public loadMenu(menu: Menu){
+      this.menu = menu;
+      this.menuSubscribe();
+      this.currentParent = this.menu.items[0];
+      this.loadLevelMenuUp(this.currentParent);
+    }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Il servizio espone un metodo pubblico chiamato \textbf{loadMenu()}, il quale prende come parametro in ingresso un oggetto di tipo \emph{Menu} passatogli dal layout dell'applicazione contente tutte le voci di Menu disponibili all'interno della pagina web.\\
+
+\begin{lstlisting}[caption={Metodo loadLevelMenuDown},style=javaScriptCode]
+     /**
+     * Carica i menu contenuti nell'item.
+     * @param item Item su cui caricare i sotto-menu
+     */
+    private loadLevelMenuDown(item: MenuItem){
+      this.currentMenuList = [];
+      item.items.forEach(child => {
+        this.currentMenuList.push(
+          this.dialService.dialProxy.createDialMenuItem(
+            child.containerId,
+            child.label, 
+            child.icon
+            ),
+          );
+        },
+      );
+      this.currentMenuList.push(
+        this.dialService.dialProxy.createDialMenuItem(
+          'Back',
+          'Back', 
+          'back'
+          ),
+        );
+      this.dialService.dialProxy.setMenu(
+        this.currentMenuList
+      )
+    }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Il metodo svolgerá le opportune analisi per ogni voce di menu contenuta e creerà dinamicamente le voci di menu da inserire nel menu del dial con i relativi comportamenti al richiamo di uno di essi, attraverso i metodi privati \textbf{loadLevelMenuDown()} e \textbf{loadLevelMenuDown()}.\\
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Metodo loadLevelMenuUp},style=javaScriptCode]
+    /**
+     * Carica il livello di voci di menu sopra parent.
+     * @param parent MenuItem contenente il livello corrente.
+     */
+    private loadLevelMenuUp(parent: MenuItem){
+      this.currentMenuList = [];
+      if (parent.level === 1){
+        this.menu.items.forEach(item => {
+          this.currentMenuList.push(
+            this.dialService.dialProxy.createDialMenuItem(
+              item.containerId, 
+              item.label, 
+              item.icon
+            )
+          );
+        }
+      );
+      }else{
+        this.menu.planItems.filter((value) => {
+          return value.level === parent.level && value.parent === parent.parent;
+        }).forEach((item) => {
+          this.currentMenuList.push(
+            this.dialService.dialProxy.createDialMenuItem(
+              item.containerId, 
+              item.label, 
+              item.icon
+            )
+          );
+        }
+        );
+        this.currentMenuList.push(
+          this.dialService.dialProxy.createDialMenuItem(
+            'Back', 
+            'Back', 
+            'back'
+          )
+        );
+      }
+      this.dialService.dialProxy.setMenu(this.currentMenuList);
+    }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Inoltré, attraverso i metodi \textbf{componentSubscribe()} e \textbf{menuSubscribe()} il servizio effettua dinamicamente le sottoscrizioni e disiscrizioni agli eventi interessati per la navigazione tra le voci di Menu.
+
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Metodo componentSubscribe},style=javaScriptCode]
+/**
+* Sottoscrivzione avviata quando si atterra in un componente 
+* da una voce di menu attraverso la navigazione con il dial
+*/
+private componentSubscribe() {
+  this.dialService.flagForHome = true;
+  this.dialService.dialProxy.setMenu([]);
+  this.componentListener = 
+  this.dialService.dialFrontendBridge.onInvokeEvent.subscribe(
+   (tag: string) => {
+     if (tag === 'home'){
+	this.dialService.flagForHome = false;
+	this.currentParent = new MenuItem();
+	this.currentParent.level = 1;
+	this.loadLevelMenuUp(this.currentParent);
+	this.menuSubscribe();
+	this.componentListener.unsubscribe();
+	this.router.navigateByUrl('/server');
+      }
+    }
+  );
+}
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Metodo menuSubscribe},style=javaScriptCode]
+/**
+* Sottoscrizione avviata durate la nagivazione tra le voci di menu non leaf
+*/
+private menuSubscribe(){
+	this.dialService.flagForHome = false;
+	this.menuListener = 
+	this.dialService.dialFrontendBridge.onInvokeEvent.subscribe(
+	(tag: string) => {
+	if (tag === 'Back'){
+		this.loadLevelMenuUp(this.currentParent);
+		this.currentParent = this.currentParent.parent;
+		}else{
+			this.menu.planItems.forEach(item => {
+				if (tag === item.containerId){
+					if (item.isLeaf){
+						this.navigateToLeaf(item);
+						this.menuListener.unsubscribe();
+						this.componentSubscribe();
+						this.currentParent = item;
+					}
+					else{
+						this.loadLevelMenuDown(item);
+						this.currentParent = item;
+					}
+				}
+			});
+			}
+		}
+	);
+}
+
+\end{lstlisting} 
+\vspace{1.0cm}
+
 \subsection{Widget}
+
+Un widget Aulos è un componente in esecuzione all’interno di una DashBoard con lo scopo di rappresentare o modificare i dati ottenuti dal backend collegato fisicamente ad una macchina.\\
+
+Nella nostra applicazione abbiamo modificato degli Widgets giá esistenti, utilizzando all'interno di essi il nostro servizio \emph{DialService}, allo scopo di renderli controllabili attraverso il Dial.Siamo partiti tentando di agganciarsi ad un semplice Widget che visualizza un range di possibili valori rappresentato da uno \emph{slider grafico}, con l'intento di variare, anche solo graficamente, il valore corrente attraverso l'evento rotazione del Dial.\\
+
+\begin{lstlisting}[caption={Sottoscrizione evento rotazione Radial Gauge},style=javaScriptCode]
+if (this.widget.runMode){
+  if (this.dialService.isDialConnected){
+	this.createMenuVoice();
+	this.dialService.dialFrontendBridge.onRotationEvent.subscribe(
+	({tag, degree}) => {
+	  if (tag === this.id){
+		this.value += (parseInt(degree, 10) * 5);
+		this.changeDetectorRef.detectChanges();
+	  }
+	});
+  }
+}
+\end{lstlisting} 
+
+
+La stessa cosa è stata fatta per un widget rappresentato graficamente da un \emph{Radial Gauge}, fino ad arrivare a modificare valori lato Backend attraverso il DialChannelWidget, un widget creato da noi che contiene al suo interno , al contrario degli widget già presenti, il collegamento a \emph{N} diversi canali modificabili.
+Questo ci ha permesso di sviluppare delle funzionalità custom per quel determinato Widget al fine di poterne acquisire il controllo, e scegliere canale per canale, il valore da settare, permettendo la variazione non solo grafica ma anche effettiva dei dati mostrati.\\
+
+Per rendere sicura queste funzionalità abbiamo previsto la variazione dei valori con la singola rotazione e la successiva modifica lato backend qualora il dial venga premuto, altrimenti attraverso la funzionalità combinata di pressione e rotazione, così da evitare una involontaria modifica nel momento della presa possesso.\\
+
+Analogamente all'evento sopra mostrato, chiamato onRotationEvent, gli eventi al quale il widget ChannelDialWidget si sottoscrive al fine di variare i valori di un canale selezionato, sia graficamente che in modo permanente lato backend, sono i seguenti:
+
+\begin{itemize}
+\item \textbf{onRotationEvent} 
+\item \textbf{onClickEvent} 
+\item \textbf{onPressedRotationEvent}
+\end{itemize}
+
+Durante la sua inizializzazione, il widget si sottoscrive all'evento di Invoke, con lo scopo di intercettare il tag sul quale viene richiamato il medesimo metodo dal Dial. Successivamente, se l'invoke richiamato restituisce il tag corrispondente all'ID del Widget in ascolto, viene pulito il menu del dial e vengono caricate le voci di menu inerenti ai canali collegati a quel determinato Widget cosi da poter essere richiamati e intercettati a loro volta dalla sottoscrizione all'evento onInvokeEvent.
  
 \section{Applicazione UWP}
+
+La seconda parte, invece, è costituita da un’ applicazione UWP ovvero Universal Windows Platform, presa in considerazione poiché la più recente tra i framework Microsoft e tra le sue caratteristiche troviamo la sicurezza e la portabilità tra le diverse piattaforme windows, ciò consente un maggiore supporto nel tempo e intercambiabilità tra i dispositivi dove utilizzarla.\\
+
+L’applicazione DialBridge ha come responsabilità quella di comunicare con il Dispositivo HID attraverso le librerie fornite da Microsoft e allo stesso tempo comunicare con la pagina Web contenuta al suo interno.\\
+
+Inizialmente abbiamo creato un’unica soluzione contenente sia la Web View che il Core dell’applicazione, ma abbiamo riscontrato un problema nell’injection dell’oggetto utilizzato per la comunicazione Web-UWP, poichè esso deve necessariamente essere iniettato a runtime.\\
+
+Di conseguenza abbiamo creato due diverse soluzioni:
+
+\begin{itemize}
+\item \textbf{Core:} Contiene il nucleo dell’applicazione.
+\item \textbf{EmbeddedBrowserView:} Contiene la parte runtime del progetto e effettua l’injection dell’oggetto nella pagina Web.
+\end{itemize}
+
+\subsection{Core}
+
+Nel Core è contenuta la parte del progetto UWP che non richiede la partenza a runtime e comprende le seguenti classi:
+
+\begin{itemize}
+\item AulosCollection
+\item AulosIcon
+\item DialController
+\item WebNotifier
+\item DialMenuItem
+\end{itemize}
+
+\subsection{AulosCollection e AulosIcon}
+
+Queste due classi si occupano, insieme al main, della parte riguardante le icone che verranno poi visualizzate nel menu del Dial. All’avvio dell’applicazione nella classe main viene effettuata una chiamata GET ad un eventuale server Loccioni che consente di ricevere un file JSON contenente una mappa “nome”-”FontGlyph” che verrà poi utilizzato per creare un DialMenuItem insieme al Font Aulos creato da Loccioni.\\
+
+L’utilizzo di questo approccio consente una maggiore facilità nella sostituzione delle icone, che non dipende dalle risorse dell’applicazione stessa ma da un server Loccioni.
+
+\subsection{DialController}
+
+La classe DialController è una tra le più importanti poiché una sua istanza verrà poi inserita all’interno della WebView e servirà al servizio DialService per la comunicazione Web-UWP. I metodi pubblici al suo interno sono gli stessi dell’interfaccia DialBackendBridge che vengono utilizzati appunto tramite l’oggetto iniettato inizialmente.\\
+
+Al suo interno troviamo un’ istanza della classe RadialController, ovvero la libreria Microsoft che permette la manipolazione del Dial, un'istanza di RadialControllerConfiguration e infine un notifier.\\
+
+Nel costruttore abbiamo assegnato agli eventi presenti nella classe RadialController il relativo handler nella classe WebNotifier, in questo modo ogni volta che verrà emesso un determinato evento la pagina web riceverà una notifica e verrà svolta la funzione associata a quella determinata voce di menù.
+
+\subsection{WebNotifier}
+
+La classe WebNotifier contiene al suo interno una istanza della WebView ed ha come responsabilità quella di fornire i metodi che verranno poi utilizzati come EventHandler per gli eventi forniti dalla classe RadialController, in modo tale da riuscire a comunicare, attraverso la WebView al suo interno, alla pagina web l’emissione dell’evento stesso.\\
+
+Al suo interno è presente anche un oggetto della classe CoreWindow utilizzato per spostare la posizione del mouse sullo schermo al primo contatto del Dial sulla superficie.
+
+\subsection{DialMenuItem}
+
+La classe DialMenuItem è una classe “modello” utilizzata per rappresentare un elemento contenuto nel Menu del Dial.
+
+\subsection{MainPage}
+
+Nella Main Page avviene l’inizializzazione dei componenti RadialController e la navigazione alla pagina web desiderata.\\
+
+All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObject che ci permette, una volta caricata la pagina, di iniettare l’oggetto della classe DialController per la comunicazione.
