@@ -1,9 +1,77 @@
 \chapter{UtilizzoDelServizio}
 \label{chap:Capitolo1}
 
-Lorem ipsum dolor sit amet, consectetur adipisci elit, sed do eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullamco laboriosam, nisi ut aliquid ex ea commodi consequatur. Duis aute irure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Per utilizzare il servizio DialService, occorre importarlo nel costruttore del componente che si sta sviluppando, in questo modo avremo accesso agli eventi che ci consentono di avere notifiche dal Dial.
+Inizialmente è necessario creare una voce di Menù che rappresenta il widget all’interno del menù del Dial, così da avere la possibilità di acquisirne il controllo ed avere accesso alle sue funzionalità.
+Sotto è riportato un esempio di creazione di una voce di menù per il dial con la relativa aggiunta alla lista di voci di Menu giá presenti.
 
-\section{Sezione Esempio}
- 
- 
-\section{Sezione Esempio}
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Creazione nuova voce da widget},style=javaScriptCode]
+  private createMenuVoice() {
+    const dialMenuVoice = this.dialService.dialProxy.createDialMenuItem(
+      this.widget.id, this.widget.descriptor.shortText, this.widget.descriptor.icon);
+    this.dialService.dialProxy.addItem(dialMenuVoice);
+  }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Una volta aggiunta la voce di Menu al Dial, essa potrá essere selezionata attraverso il metodo Inkove messo a disposizione dalla classe DialController. Il metodo Invoke per acquisire una voce di menu, potrá essere richiamato sia attraverso il menu contestuale del Dial che compare nello schermo, che tramite un nostro metodo chiamato appunto ManualInvoke che esegue questa azione manualmente, richiamando tramite Web il medesimo metodo, solamente se quella voce di menu é presente tra quelle disponibile nel Dial.
+In questo modo, il Widget non dovrá fare altro che mettersi in ascolto del metodo onInvokeEvent, il quale quando richiamato, restituisce una stringa definita “tag”, rappresentante la voce Menu acquisita.
+Se quel tag, corrisponde all’id del Widget in ascolto, significa che l’utente ha richiesto il controllo di quel determinato Widget.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Ascolto Invoke della voce di menu'},style=javaScriptCode]
+  this.dialService.dialFrontendBridge.onInvokeEvent.subscribe(tag => {
+        if (tag === this.widget.id) {
+          this.isActive = true;
+          this.dialService.widget = this.widget.id;
+          this.widgetDialStart();
+          this.dialService.dialProxy.manualInvoke(this.channels[0].parameter.value);
+        }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Una volta acquisito il controllo del Widget, bisognerá mettersi in ascolto delle funzioni richiamabili dal Dial, attraverso gli eventEmitter messi a disposizione dalla classe DialFrontndBridge, e implementare il comportamento di quel Widget all’emissione di determinati eventi come la Rotazione o il Click.
+
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Ascolto eventi associati alla voce di menu' selezionata},style=javaScriptCode]
+const rotation = this.dialService.dialFrontendBridge.onRotationEvent.subscribe(
+	({ tag, degree }) => {
+      // Azione associata all'evento rotazione del Dial.
+      if (tag === this.channels[this.currentChannel].parameter.value) {
+        this.setSetterAtIndex(this.currentChannel, 
+        parseNumber(degree)* this.moltiplicator
+        );
+      }
+    });
+
+const click = this.dialService.dialFrontendBridge.onClickEvent.subscribe(
+	(tag) => {
+      // Azione associata all'evento click del Dial.
+      if(tag === this.channels[this.currentChannel].parameter.value){
+          this.setChannelValue(this.channels[this.currentChannel].parameter.code,
+          this.getNumberSetterComponent(this.currentChannel).value);
+        }
+    });
+
+const pressRot = this.dialService.dialFrontendBridge.onPressedRotationEvent.subscribe(
+({ tag, degree }) => {
+      // Azione associata all'evento rotazione con pressione del Dial.
+      if (tag === this.channels[this.currentChannel].parameter.value) {
+        this.setSetterAtIndex(
+        this.currentChannel, 
+        parseNumber(degree) * this.moltiplicator
+        );
+        this.setChannelValue(this.channels[this.currentChannel].parameter.code,
+        this.getNumberSetterComponent(this.currentChannel).value);
+      }
+    });
+    this.channelDialSubscriptions?.unsubscribe();
+    this.channelDialSubscriptions = new Subscription();
+    this.channelDialSubscriptions.add(rotation).add(click).add(pressRot);
+\end{lstlisting} 
+\vspace{1.0cm}
+
+
+I metodo sopra implementati, permettono di eseguire una determinata azione quando viene richiamato un metodo presente in DialFrontendBridge come la rotazione o la pressione combinata alla rotazione, che permette quindi nel caso dell'acquisizione tramite il contatto del Dial sullo schermo, mantenendo il controllo e il relativo comportamento, anche appoggiandolo sulla scrivania, evitano il pericolo che nel tratto in cui é il dispositivo si trova sospeso, possano avvenire chiamate pericolose.

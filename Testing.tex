@@ -1,9 +1,40 @@
 \chapter{Testing}
 \label{chap:Capitolo1}
 
-Lorem ipsum dolor sit amet, consectetur adipisci elit, sed do eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrum exercitationem ullamco laboriosam, nisi ut aliquid ex ea commodi consequatur. Duis aute irure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Per quanto riguarda i test svolti in ambito UWP abbiamo utilizzato MSTest fornito da Microsoft all’interno di Visual Studio per testare le funzionalitá messe a disposizione dalla classe RadialController.
 
-\section{Sezione Esempio}
+\section{MSTest}
+Visual Studio Unit Testing Framework descrive la suite di strumenti di unit test di Microsoft integrata in alcune versioni di Visual Studio 2005 e successive.
+Qui sotto sono riportati due tra i vari test implementati nel progetto:
  
- 
-\section{Sezione Esempio}
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Test SetMenu},style=javaScriptCode]
+    [UITestMethod]
+        public void TestSetMenu()
+        {
+            Assert.IsFalse(radialController.Menu.Items.Count > 0);
+            DialMenuItem item1 = dialController.CreateDialMenuItem("tag1", "d", "icon");
+            DialMenuItem item2 = dialController.CreateDialMenuItem("tag2", "d", "icon");
+            DialMenuItem item3 = dialController.CreateDialMenuItem("tag3", "d", "icon");
+            DialMenuItem item4 = dialController.CreateDialMenuItem("tag4", "d", "icon");
+            List<DialMenuItem> items = new List<DialMenuItem>();
+            items.Add(item1);
+            items.Add(item2);
+            items.Add(item3);
+            items.Add(item4);
+            dialController.SetMenu(items);
+            Assert.IsTrue(radialController.Menu.Items.Count == 4);
+        }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Test aggiunta voce di Menu'},style=javaScriptCode]
+  [UITestMethod]
+        public void TestAddItem(){
+            Assert.IsFalse(radialController.Menu.Items.Count > 0);
+            dialController.AddItem(dialController.CreateDialMenuItem("tag", "d", "icon"));
+            Assert.IsTrue(radialController.Menu.Items.Count > 0);
+        }
+\end{lstlisting} 
+\vspace{1.0cm}
