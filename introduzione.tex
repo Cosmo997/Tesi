@@ -1,24 +1,20 @@
 \chapter{Introduzione}
 \label{chap:intro}
 
-Considerato che, negli ultimi anni, lo sviluppo e controllo di software aziendali si sta spostando in maniera decisa verso il Web, permettendo una maggior portabilitá e scalabilitá, con conseguente controllo da remoto tramite qualsiasi dispositivo connesso alla rete e che l’utilizzo di dispositivi di input che utilizzano il protocollo HID é sempre piú richiesto e talvolta necessario per una miglior esperienza utente, il gruppo Loccioni ci ha proposto di analizzare le possibili strade da percorre per integrare un dispositivo Microsoft, in particolare il Surface Dial, che grazie al posizionamento su schermo touch-screen, permetta l’acquisizione di componenti e il controllo degli stessi.
-Lo scopo finale di questo progetto è quindi quello poter integrare il dispositivo “Microsoft Surface Dial” nei software Loccioni, sia lato Web che Windows Form, con l'obiettivo di rendere piú fluida e intuitiva l’esperienza utente, consentendo di svolgere operazioni in parallelo che, normalmente vengono eseguite tramite dispositivi di input classici come mouse e tastiera, attraverso l’utilizzo di entrambe le mani, mantenendo il focus di un dispositivo su un determinato compito.
-
-Aggiungere foto banchi test loccioni e allungare il brodo.
-
+Negli ultimi anni, lo sviluppo e controllo di software aziendali si sta spostando in maniera decisa verso il Web, permettendo una maggior portabilità e scalabilità in termini di sviluppo e riutilizzo, consentendo il controllo da remoto tramite qualsiasi dispositivo connesso alla rete. Di conseguenza l’utilizzo di dispositivi di input che si basano sul protocollo HID é sempre piú richiesto e talvolta necessario anche in ambienti Web, per una miglior esperienza utente e una maggior precisione nelle operazioni.
+Durante il nostro periodo di Stage++ svolto presso l'impresa \emph{Loccioni}, ci é stato proposto di analizzare le possibili strade da percorre al fine di integrare un dispositivo Microsoft, in particolare il \emph{Surface Dial}, all'interno delle loro Dashbord, utilizzate per la visualizzazione e la manipolazione dei dati durante le fasi di testing su componenti elettronici.
+\begin{center}
+\includegraphics[width=0.5\textwidth]{loccioni}
+\end{center}
 \section{Obiettivo}
-Descrivere brevemente la visione di Luca per l'utilizzo finale del dial nei banchi test Loccioni
+Attualmente nei banchi prova dove vengono effettuati i test su componenti elettrici di Automobili, lo strumento principale per la variazione dei dati é rappresentato da una pulsantiera visibile nella foto RIF, composta da potenziometri analogici, bottoni e switch, i quali rappresentano delle evidenti limitazioni in termini  di usabilità e sicurezza.Per questo motivo, attraverso una digitalizzazione della pulsantiera e l'utilizzo di un dispositivo di precisione, l'utilizzo finale di un banco prova risulterebbe piú sicuro e semplice da utilizzare per l'operatore, migliorandone l'efficienza e la precisione con conseguente risparmio in termini di tempo e denaro.\\
 
-\section{Struttura della Tesi}
-L'esposizione di questo elaborato sará cosi suddivisa:
-- il capitolo n "nome" descrive bla bla bla
-- il capitolo n "nome" descrive bla bla bla
-- il capitolo n "nome" descrive bla bla bla
-- il capitolo n "nome" descrive bla bla bla
+L'elaborato in questione ha quindi come obbiettivo l'integrazione del dispositivo Microsoft \textbf{Surface Dial} nei software Web Loccioni, in particolare nelle Dashboard utilizzate nei banchi prova per la visualizzazione e la manipolazione dei dati, con lo scopo di rendere piú fluida e intuitiva l'esperienza utente e consentendo all'operatore finale di svolgere operazioni in parallelo, attraverso l'utilizzo di entrambe le mani, mantenendo il focus di un dispositivo su un determinato compito.\\
 
+A tal proposito, per rendere possibile tale integrazione é stato necessario svolgere un fase di analisi del dispositivo da integrare e della Dashboard sulla quale verrá utilizzato. Quello che ne risulta, é un servizio ideato e sviluppato con lo scopo principale di permettere la comunicazione tra il dispositivo HID in questione e una qualsiasi pagina Web.
+
+\newpage
 \section{Analisi e Studio di Fattibilità}
-
-Nel nostro primo incontro con l'impresa Loccioni siamo stati accompagnati dal nostro tutor aziendale, Luca Mazzuferi, nelle varie aree dell'impresa per verificare dove il Dial possa effettivamente aiutare l'operatore nelle azioni quotidiane per la calibrazione o la modifica di dati in modo efficiente e sicuro, migliorandone la user experience.\\
 
 L'idea iniziale era quella di utilizzare il Dial per il controllo di macchinari, che attualmente fanno uso di programmi Windows Forms per la manipolazione dei dati, mentre si appoggiano ad un loro Framework Web per la visualizzazione in tempo reale dei dati stessi.\\
 
@@ -33,9 +29,8 @@ Per prima cosa ci siamo dedicati alla lettura della documentazione scritta da Mi
 
 Una volta individuate le potenzialità del Dial, abbiamo iniziato una fasi di testing su applicazioni native per comprendere come e dove potevamo utilizzare le librerie messe a disposizione per il dispositivo, con la successiva creazione di un piccolo prototipo che sfruttasse e mostrasse le suddette funzionalità.\\
 
-Successivamente ci siamo dedicati alla comunicazione tra un qualsiasi tipo di ambiente software e il Dial, scoprendo che il dispositivo comunica attraverso il protocollo HID con qualsiasi Hardware, ma senza l'utilizzo della Libreria RadialController, si vanno a perdere tutte quelle funzionalità che permettono 4 l'utilizzo completo del Dial, rendendolo meno necessario in termini di miglioramento della User Experience.
+Successivamente ci siamo dedicati alla comunicazione tra un qualsiasi tipo di ambiente software e il Dial, scoprendo che il dispositivo comunica attraverso il protocollo HID con qualsiasi Hardware, ma senza l'utilizzo della Libreria RadialController, si vanno a perdere tutte quelle funzionalità che permettono l'utilizzo completo del Dial, rendendolo meno necessario in termini di miglioramento della User Experience.
  
-\newpage
 \subsection{Ricerca}
 
 Durante lo studio di fattibilità, ci siamo dedicati alla ricerca di progetti che utilizzassero il Dial indifferentemente dall’ambiente, da quello grafico a quello audio, trovando solamente un programma che permetteva l'utilizzo del Dial in un Sintetizzatore Software, attraverso il protocollo MIDI, limitando il controllo alla semplice rotazione e pressione, togliendo tutte quelle funzionalità più interessanti, come il posizionamento del dispositivo sullo schermo e la visualizzazione dinamica del Menu in relazione alla posizione in cui trova.\\
@@ -47,27 +42,13 @@ Dato il crescente sviluppo dell'utilizzo di applicazioni web e del relativo cont
 Considerando che il posizionamento su schermo è supportato solamente da determinati dispositivi Microsoft ( Surface Studio, Surface Pro 4/5/6, ...) abbiamo pensato di creare un’applicazione UWP (Universal Windows Platform) che potesse girare nativamente su tali dispositivi. Per poter infine, acquisire il controllo di una pagina web, abbiamo deciso di utilizzare una WebView avviata a RunTime permettendo all'utente di poter utilizzare il Dial sui dispositivi che supportano l'interazione con lo schermo grazie alle Librerie Native, ma anche di poterla utilizzare senza l'utilizzo del Dial, attraverso un qualsiasi browser web.
 
 \newpage
-\subsection{Problematiche riscontrate}
-
-Una volta avvenuto il caricamento della pagina Web nell'applicazione UWP, ci rimaneva da risolvere il problema della comunicazione tra due linguaggi differenti, quello Web, nel nostro caso, basato sul TypeScript e quello UWP interamente in C e XAML.\\
-
-Le comunicazioni dovevano avvenire in maniera bi-direzionale, questo significa che non é solamente l'applicazione UWP a comunicare con la pagina Web, ma anche viceversa. Affinché l'applicazione potesse comunicare con la pagina Web, grazie alla funzionalità InvokeScriptAsync, messa a disposizione dalla WebView, abbiamo definito delle chiamate asincrone che potessero inviare parametri o notificare l'avvenuta emissione di un evento alla pagina Web stessa. Il problema era come poter comunicare dalla pagina Web all'applicazione UWP che fosse avvenuto qualcosa.\\
-
-Per risolvere questa problematica ci siamo trovati davanti a due possibilitá:
-
-\begin{enumerate}
-\item Utilizzare la funzionalitá della WebView chiamata ScriptNotify che permette la notifica all'applicazione UWP dell'avvenuta emissione di un determinato evento nella pagina Web.
-\item Utilizzare il decoratore AllowForWeb su una classe, affinché un'istanza di essa, possa essere iniettata nella pagina Web.
-\end{enumerate}
-
-Dopo aver letto la documentazione e effettuato vari test, la scelta è ricaduta sul decoratore AllowForWeb, in quanto lo ScriptNotify permetteva di mettersi in ascolto di solamente un determinato evento e permetteva il ritorno di una sola stringa come parametro, oltre al fatto che leggendo su varie Community come StackOverflow, venisse sconsigliata questa pratica poiché non sicura in quanto andava necessariamente abilitato lato UWP l'URI di ogni singola pagina da controllare e limitante in termini di prestazioni.\\ 
-
-In contrapposizione, utilizzare AllowForWeb su di una classe e iniettare un'istanza nella pagina, ci permetteva un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.\\ 
-
-A quel punto l’unico problema rimasto era l’utilizzo di questo oggetto all’interno del Framework Aulos Loccioni, che abbiamo però risolto attraverso lo sviluppo di un servizio Angular che aggiunge livelli di sicurezza e definisce delle API di utilizzo per gli sviluppatori futuri che vorranno integrare l'utilizzo del Dial nelle proprie pagine Web.
-
-
-
+\section{Struttura della Tesi}
+L'esposizione del seguente documento sará cosi suddivisa:
+\begin{itemize}
+\item Il capitolo \emph{Metodologie e strumenti di sviluppo} espone la metodologia utilizzata per lo sviluppo del lavoro in team e descrive le tecnologie utilizzate nel corso del progetto.
+\item Il capitolo \emph{Architettura} descrive la struttura del progetto e in dettaglio le funzionalità implementate grazie ad esso.
+\item Il capitolo \emph{Conclusione} racchiude le considerazioni critiche sul lavoro svolto ed espone delle possibili implementazioni future atte a migliorare il servizio.
+\end{itemize}
 
 
 
