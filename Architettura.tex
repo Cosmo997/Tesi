@@ -1,15 +1,15 @@
 \chapter{Servizio}
 \label{chap:serv}
-Preambolo
-In questo capitolo verrá esposta l'architettura finale dell'applicativo sviluppato che permette la comunicazione tra il Surface Dial e la pagina web.\\
+In questo capitolo verranno esposti in dettaglio l'architettura finale dell'applicativo sviluppato che permette la comunicazione tra il Surface Dial e la pagina web, le funzionalitá implementate grazie al suddetto servizio, una breve descrizione per lo sviluppatore che intederá utilizzarlo e i test implementati attraverso MSTest con lo scopo di verificare il corretto funzionamento del software
 \section{Architettura Software}
-Il progetto si presenta suddiviso in due parti ben distinte:
+Il progetto sviluppato si presenta suddiviso in due parti ben distinte:
 \begin{itemize}
-\item \textbf{Servizio Angular}.
-\item \textbf{Applicazione UWP} (Universal Windows Plaform).
+\item \textbf{Servizio Angular}
+\item \textbf{Applicazione UWP}
 \end{itemize}
 
 \subsection{Servizio Angular}
+
 In Angular, i Servizi rappresentano un tassello fondamentale per la realizzazione di un'applicazione. Un servizio è solitamente rappresentato da una classe indipendente dalla View che viene definita per svolgere un compito ben preciso ed effettuare delle operazioni strettamente correlate tenendo in mente il principio di singola responsabilità.\\
 È possibile definire più servizi all'interno di un'applicazione, ognuno dei quali si occupa di portare a termine un determinato incarico incrementando la modularitá del progetto, inoltre un servizio puó a sua volta dipendere da altri servizi, che vengono definiti nel costruttore del servizio stesso.\\
 
@@ -55,19 +55,6 @@ Il core del servizio implementato è rappresentato dalla Classe DialService, ess
 
 L'oggetto dial viene poi inserito per questioni di sicurezza in una classe DialProxy, la quale implementa a sua volta l'interfaccia da noi sviluppata DialBackendBridge, nella quale sono presenti tutte le funzionalitá dell'oggetto "dial", richiamabili quindi da Web.
 
-\subsubsection{DialProxy}
-
-Al fine di aggiungere un livello di sicurezza sull’oggetto iniettato e sul suo successivo utilizzo, abbiamo deciso di implementare una classe chiamata DialProxy con la responsabilitá di wrappare l’oggetto e quindi di intercettare le chiamate fatte su di esso.\\
-
-La classe DialProxy prende quindi in ingresso nel suo costruttore un oggetto di tipo DialBackendBridge, che rappresenta l'oggetto iniettato, e come secondo parametro il servizio DialService per poter accedere rapidamente alle proprietá del servizio e poter effettuare determinati controlli prima di richiamare un metodo.\\
-
-\vspace{1.0cm}
-\begin{lstlisting}[caption={Wrapping oggetto recuperato},style=javaScriptCode]
-	this.dialProxy = new DialProxy(this.dial, this);
-\end{lstlisting} 
-\vspace{1.0cm}
-
-\newpage
 \subsubsection{DialBackendBridge}
 
 DialBeckendBridge rappresenta l'interfaccia contenente la dichiarazione dei metodi implementati nella classe DialController dell'applicazione UWP.\\
@@ -104,7 +91,7 @@ Per rendere questa comunicazione bi-direzionale, abbiamo creato una classe DialF
 
 L'invocazione di questi metodi comporta la successiva emissione di un determinato evento a coloro che vi si sottoscrivono, con la possibilitá del passaggio di parametri di tipo stringa.\\
 
-Tramite l'utilizzo degli EventEmitter messi a disposizione dal core di Angular e definiti come mostrato nel codice sottostante, la classe DialFrontendBridge permette all'utilizzatore del servizio di sottoscriversi a determinati eventi pubblici, che quando richiamati emettono un determinato valore. RIFERIMENTO A CODICE \\
+Tramite l'utilizzo degli EventEmitter messi a disposizione dal core di Angular e definiti come mostrato nel codice sottostante, la classe DialFrontendBridge permette all'utilizzatore del servizio di sottoscriversi a determinati eventi pubblici, che quando richiamati emettono un determinato valore.\\
 
 \vspace{1.0cm}
 \begin{lstlisting}[caption={EventEmitter esposti da DialFrontendBridge},style=javaScriptCode]
@@ -121,256 +108,48 @@ public onScreenContactEndedEvent = new EventEmitter();
 Affinché questi metodi possano essere richiamati tramite script dall'applicazione UWP é stato necessario inserire l'istanza della classe all'interno dell'oggetto window, cosi da renderlo visibile e utilizzabile dall'esterno.\\
 
 \vspace{1.0cm}
-\begin{lstlisting}[caption={Inserimento classe DialFrontendbridge in window },style=javaScriptCode]
+\begin{lstlisting}[caption={Inserimento DialFrontendbridge in window },style=javaScriptCode]
 (windowa as any).DialFrontendBridge = this.dialFrontendbridge;
 \end{lstlisting} 
 \vspace{1.0cm}
 
 \newpage
 \vspace{1.0cm}
-\begin{lstlisting}[caption={Metodi esposti da DialFrontendBridge},style=javaScriptCode]
-   /**
-     * Metodo richiamato da UWP che notifica la rotazione del Microsoft Dial.
-     * @param tag Identificatore dell'elemento che ha eseguito la rotazione
-     * @param degree Gradi della rotazione
-     */
+\begin{lstlisting}[caption={Metodi esposti DialFrontendBridge},style=javaScriptCode]
     public RotationEvent(tag: string, degree: string): string{
         this.onRotationEvent.emit({tag, degree});
         return degree;
     }
-
-    /**
-     * Metodo richiamato da UWP che notifica la rotazione de
-     * l Microsoft Dial con il Dial premuto.
-     * @param tag Identificatore dell'elemento che ha eseguito la rotazione
-     * @param degree Gradi della rotazione
-     */
     public PressedRotationEvent(tag: string, degree: string): string{
         this.onPressedRotationEvent.emit({tag, degree});
         return degree;
     }
-
-    /**
-     * Metodo richiamato dall'UWP che notifica la pressione del del Microsoft Dial.
-     * @param tag Identificatore dell'elemeto che ha eseguito il click sul Dial.
-     */
     public ClickEvent(tag: string){
             this.onClickEvent.emit(tag);
     }
-
-    /**
-     * Metodo richiamato dall'UWP che notifica l'invocazione di un elemento di Menu.
-     * @param tag Identificatore del MenuItem che ha eseguito l'invoke.
-     */
     public InvokeEvent(tag: string){
         this.onInvokeEvent.emit(tag);
     }
-
-    /**
-     * Metodo richiamato dall'UWP che notifica il contatto del 
-     * dispositivo Dial con lo schermo nel punto con coordinate x e y.
-     * @param x Coordinata x della posizione
-     * @param y Coordinata y della posizione
-     */
     public ScreenContactStartedEvent(x: string, y: string){
         this.onScreenContactStartedEvent.emit({x, y});
     }
-
-    /**
-     * Metodo richiamato dall'UWP che notifica lo spostamento del 
-     * dispositivo Dial sullo schermo nel punto con coordinate x e y.
-     * @param x Coordinata x della posizione
-     * @param y Coordinata y della posizione
-     */
     public ScreenContactContinuedEvent(x: string, y: string){
         this.onScreenContactContinuedEvent.emit({x, y});
     }
-
-    /**
-     * Metodo richiamato dall'UWP che norifica 
-     * quando il Dial viene rimosso dallo schermo
-     */
     public ScreenContactEndedEvent(){
         this.onScreenContactEndedEvent.emit();
     }
 \end{lstlisting} 
-\vspace{1.0cm}
-
-\subsubsection{DialMenuLoader}
-
-Il secondo servizio implementato, chiamato DialMenuLoader é un perfetto esempio di come usufruire del servizio DialService all'interno di Componenti o Servizi.\\
-
-DialMenuLoader ha lo scopo di creare dinamicamente le voci di Menu da inserire nel dial e di definire per ciascuna voce il comportamento, che in questo caso rappresenta la navigazione tra le voci di menu di un ServerLayout Loccioni.\\
-
-Grazie al servizio DialService e a quello Router inseriti nel costruttore, questo sotto-servizio permette di sottoscriversi automaticamente agli eventi di navigazione della pagina e a quelli del dial, così da caricare le giuste voci del menu in base al livello in cui si trova, caricando la voce di menu Home solo se si "atterra" in un componente altrimenti quella Back per navigare il menu nel senso opposto.\\
-
-\begin{lstlisting}[caption={Metodo loadLevelMenuUp},style=javaScriptCode]
-    /**
-     * Carica un menu nel Dial e lo rende navigabile.
-     * @param menu Menu da caricare nel Dial.
-     */
-    public loadMenu(menu: Menu){
-      this.menu = menu;
-      this.menuSubscribe();
-      this.currentParent = this.menu.items[0];
-      this.loadLevelMenuUp(this.currentParent);
-    }
-\end{lstlisting} 
-\vspace{1.0cm}
-
-Il servizio espone un metodo pubblico chiamato \textbf{loadMenu()}, il quale prende come parametro in ingresso un oggetto di tipo \emph{Menu} passatogli dal layout dell'applicazione contente tutte le voci di Menu disponibili all'interno della pagina web.\\
-
-\begin{lstlisting}[caption={Metodo loadLevelMenuDown},style=javaScriptCode]
-     /**
-     * Carica i menu contenuti nell'item.
-     * @param item Item su cui caricare i sotto-menu
-     */
-    private loadLevelMenuDown(item: MenuItem){
-      this.currentMenuList = [];
-      item.items.forEach(child => {
-        this.currentMenuList.push(
-          this.dialService.dialProxy.createDialMenuItem(
-            child.containerId,
-            child.label, 
-            child.icon
-            ),
-          );
-        },
-      );
-      this.currentMenuList.push(
-        this.dialService.dialProxy.createDialMenuItem(
-          'Back',
-          'Back', 
-          'back'
-          ),
-        );
-      this.dialService.dialProxy.setMenu(
-        this.currentMenuList
-      )
-    }
-\end{lstlisting} 
-\vspace{1.0cm}
-
-Il metodo svolgerá le opportune analisi per ogni voce di menu contenuta e creerà dinamicamente le voci di menu da inserire nel menu del dial con i relativi comportamenti al richiamo di uno di essi, attraverso i metodi privati \textbf{loadLevelMenuDown()} e \textbf{loadLevelMenuDown()}.\\
-
-\vspace{1.0cm}
-\begin{lstlisting}[caption={Metodo loadLevelMenuUp},style=javaScriptCode]
-    /**
-     * Carica il livello di voci di menu sopra parent.
-     * @param parent MenuItem contenente il livello corrente.
-     */
-    private loadLevelMenuUp(parent: MenuItem){
-      this.currentMenuList = [];
-      if (parent.level === 1){
-        this.menu.items.forEach(item => {
-          this.currentMenuList.push(
-            this.dialService.dialProxy.createDialMenuItem(
-              item.containerId, 
-              item.label, 
-              item.icon
-            )
-          );
-        }
-      );
-      }else{
-        this.menu.planItems.filter((value) => {
-          return value.level === parent.level && value.parent === parent.parent;
-        }).forEach((item) => {
-          this.currentMenuList.push(
-            this.dialService.dialProxy.createDialMenuItem(
-              item.containerId, 
-              item.label, 
-              item.icon
-            )
-          );
-        }
-        );
-        this.currentMenuList.push(
-          this.dialService.dialProxy.createDialMenuItem(
-            'Back', 
-            'Back', 
-            'back'
-          )
-        );
-      }
-      this.dialService.dialProxy.setMenu(this.currentMenuList);
-    }
-\end{lstlisting} 
-\vspace{1.0cm}
-
-Inoltré, attraverso i metodi \textbf{componentSubscribe()} e \textbf{menuSubscribe()} il servizio effettua dinamicamente le sottoscrizioni e disiscrizioni agli eventi interessati per la navigazione tra le voci di Menu.
-
-
-\vspace{1.0cm}
-\begin{lstlisting}[caption={Metodo componentSubscribe},style=javaScriptCode]
-/**
-* Sottoscrivzione avviata quando si atterra in un componente 
-* da una voce di menu attraverso la navigazione con il dial
-*/
-private componentSubscribe() {
-  this.dialService.flagForHome = true;
-  this.dialService.dialProxy.setMenu([]);
-  this.componentListener = 
-  this.dialService.dialFrontendBridge.onInvokeEvent.subscribe(
-   (tag: string) => {
-     if (tag === 'home'){
-	this.dialService.flagForHome = false;
-	this.currentParent = new MenuItem();
-	this.currentParent.level = 1;
-	this.loadLevelMenuUp(this.currentParent);
-	this.menuSubscribe();
-	this.componentListener.unsubscribe();
-	this.router.navigateByUrl('/server');
-      }
-    }
-  );
-}
-\end{lstlisting} 
-\vspace{1.0cm}
-
-\vspace{1.0cm}
-\begin{lstlisting}[caption={Metodo menuSubscribe},style=javaScriptCode]
-/**
-* Sottoscrizione avviata durate la nagivazione tra le voci di menu non leaf
-*/
-private menuSubscribe(){
-	this.dialService.flagForHome = false;
-	this.menuListener = 
-	this.dialService.dialFrontendBridge.onInvokeEvent.subscribe(
-	(tag: string) => {
-	if (tag === 'Back'){
-		this.loadLevelMenuUp(this.currentParent);
-		this.currentParent = this.currentParent.parent;
-		}else{
-			this.menu.planItems.forEach(item => {
-				if (tag === item.containerId){
-					if (item.isLeaf){
-						this.navigateToLeaf(item);
-						this.menuListener.unsubscribe();
-						this.componentSubscribe();
-						this.currentParent = item;
-					}
-					else{
-						this.loadLevelMenuDown(item);
-						this.currentParent = item;
-					}
-				}
-			});
-			}
-		}
-	);
-}
-
-\end{lstlisting} 
-\vspace{1.0cm}
 
 \subsubsection{Widget}
+
+TODO: DA COMPLETARE
 
 Un widget Aulos è un componente in esecuzione all’interno di una DashBoard con lo scopo di rappresentare o modificare i dati ottenuti dal backend collegato fisicamente ad una macchina.\\
 
 Nella nostra applicazione abbiamo modificato degli Widgets giá esistenti, utilizzando all'interno di essi il nostro servizio \emph{DialService}, allo scopo di renderli controllabili attraverso il Dial.Siamo partiti tentando di agganciarsi ad un semplice Widget che visualizza un range di possibili valori rappresentato da uno \emph{slider grafico}, con l'intento di variare, anche solo graficamente, il valore corrente attraverso l'evento rotazione del Dial.\\
 
-\begin{lstlisting}[caption={Sottoscrizione evento rotazione Radial Gauge},style=javaScriptCode]
+\begin{lstlisting}[caption={Sottoscrizione evento rotazione},style=javaScriptCode]
 if (this.widget.runMode){
   if (this.dialService.isDialConnected){
 	this.createMenuVoice();
@@ -384,7 +163,6 @@ if (this.widget.runMode){
   }
 }
 \end{lstlisting} 
-
 
 La stessa cosa è stata fatta per un widget rappresentato graficamente da un \emph{Radial Gauge}, fino ad arrivare a modificare valori lato Backend attraverso il DialChannelWidget, un widget creato da noi che contiene al suo interno , al contrario degli widget già presenti, il collegamento a \emph{N} diversi canali modificabili.
 Questo ci ha permesso di sviluppare delle funzionalità custom per quel determinato Widget al fine di poterne acquisire il controllo, e scegliere canale per canale, il valore da settare, permettendo la variazione non solo grafica ma anche effettiva dei dati mostrati.\\
