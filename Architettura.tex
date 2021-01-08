@@ -462,7 +462,180 @@ All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObje
 
 \subsection{Aquisizione widget}
 \subsection{Posizionamento su schermo}
+
+Uno dei maggiori vantaggi dell’utilizzo di un surface Dial è la possibilità di posizionarlo sopra uno schermo compatibile e di cambiare il suo funzionamento in base alla posizione utilizzata.
+Questa funzionalità è gestita dal sistema operativo e comunica solamente con elementi nativi UWP, considerando ciò, abbiamo cercato un servizio Angular che ci permettesse di svolgere la stessa funzione all’interno di una pagina web ma senza risultati.
+\begin{figure}[htpb!]
+  \centering
+  \includegraphics[width=0.5\textwidth]{DialSchermo}
+  \caption{Microsoft Dial posizionato sopra un surface pro 6}
+\end{figure}
+Inizialmente abbiamo preso in considerazione la possibilitá di suddividere il layout dell’applicazione nativa in N riquadri, all’interno dei quali avremo posizionato il relativo Widget da controllare. Questa soluzione presenta peró delle limitazioni, in quanto in base alla risoluzione del dispositivo utilizzato, i widget caricabili in ogni riquadro del layout erano limitati al numero di riquadri definiti dall’applicazione UWP.
+
+Abbiamo quindi cercato una soluzione, che spostasse la responsabilitá di acquisire il posizionamento lato Web anziché lato UWP. Dopo vari tentativi, abbiamo escogitato una soluzione che ci permettesse di avere un numero variabile di Widget configurabili nella Dashboard e la successiva acquisizione di essi, per fare ciò abbiamo sfruttato
+Analizzando gli eventi richiamabili dalla classe RadialController, in particolare quelli inerenti al contatto con lo schermo, abbiamo notato prendevano in ingresso un oggetto di tipo RadialControllerScreenContact fornitogli dalla Libreria. Questo oggetto possiede due attributi relativi al Posizionamento ( Position ) e al Bound ( Bounds ) del rettangolo generato dal Dial sullo schermo.
+
+Grazie all’attributo Position di tipo Point, é possibile ottenere, attraverso le coordinate X e Y, il punto centrale nel quale il Dial é posizionato.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Metodo ScreenContactStartedAsync},style=javaScriptCode]
+ internal async Task ScreenContactStartedAsync(
+ 	RadialControllerScreenContactStartedEventArgs args
+ )
+  {
+    this.simpleHaptics = args.SimpleHapticsController;
+    string x = args.Contact.Position.X.ToString();
+    string y = args.Contact.Position.Y.ToString();
+    window.PointerPosition = new Point(
+    	args.Contact.Position.X, 
+    	args.Contact.Position.Y
+    	);
+    string function = 
+    "window.DialFrontendBridge.ScreenContactStartedEvent('" + x + "', '" + y + "')";
+    await webView.InvokeScriptAsync("eval", new string[] { function });
+    onScreen = true;
+    inputInjector.InjectMouseInput(new[] { inputInfo });
+    inputInfo.MouseOptions = InjectedInputMouseOptions.Move;
+    inputInfo.DeltaY = 1;
+  }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+
+Attraverso la libreria Window.UI.Core é possibile spostare il cursore in un punto definito della UI corrente. Per questo motivo, la classe WebNotifier presente un attributo private e readonly chiamato window, un oggetto di tipo WindowCore che permette di intercettare eventi relativi ai dispositivi di Input utilizzati ma anche di posizionare il cursore del dispositivo in una posizione specifica in base alle coordinate passategli. In questo modo, attraverso l’attributo PointerPosition siamo stato in grado di creare un nuovo oggetto di tipo Point con le coordinate X e Y acquisite dal Dial consentendoci di posizionare il cursore in quel determinato punto.
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Spostamento cursore},style=javaScriptCode]
+  window.PointerPosition = new Point(args.Contact.Position.X, args.Contact.Position.Y);
+\end{lstlisting} 
+\vspace{1.0cm}
+Questa soluzione ci ha permesso di spostare dinamicamente il cursore nella posizione centrale al disotto del Dial quando viene posizionato sopra lo schermo così da poter intercettare lato Web la posizione del cursore e permettere agli utilizzatori del servizio di riprodurre il comportamente appropriato per il Widget sopra il quale ci si posiziona.
+Abbiamo quindi previsto nel Template HTML del Widget un metodo OnMouseOver che venisse richiamato solamente qualora il Dial fosse effettivamente a contatto con lo schermo, ma il semplice spostamento del cursore nella nuova posizione non richiamava correttamente il metodo in quanto il cursore non effettuava un movimento, ma veniva ricreato in quella determinata posizione.
+Affinché la soluzione ideata funzionasse correttamente abbiamo importato una libreria chiamata Windows.UI.Input.Preview.Injection che mette a disposizione funziolitá per la simulazione di eventi di input.
+
+Una volta posizionato il cursore nella nuova posizione, siamo stati in grado di simulare un impercettibile movimento del cursore di un singolo pixel, grazie al quale ci é stato possibile intercettare correttamente l’evento OnMouseMove dichiarato nel Template del Widget eseguendo il metodo associato.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Spostamento cursore},style=javaScriptCode]
+inputInjector.InjectMouseInput(new[] { inputInfo });
+inputInfo.MouseOptions = InjectedInputMouseOptions.Move;
+inputInfo.DeltaY = 1;
+\end{lstlisting} 
+\vspace{1.0cm}
 \subsection{Feedback aptico}
 \subsection{Variazione degree personalizzata}
 \section{Utilizzo del Servizio}
+
+Per utilizzare il servizio DialService, occorre importarlo nel costruttore del componente che si sta sviluppando, in questo modo avremo accesso agli eventi che ci consentono di avere notifiche dal Dial.
+Inizialmente è necessario creare una voce di Menù che rappresenta il widget all’interno del menù del Dial, così da avere la possibilità di acquisirne il controllo ed avere accesso alle sue funzionalità.
+Sotto è riportato un esempio di creazione di una voce di menù per il dial con la relativa aggiunta alla lista di voci di Menu giá presenti.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Creazione nuova voce da widget},style=javaScriptCode]
+  private createMenuVoice() {
+    const dialMenuVoice = this.dialService.dialProxy.createDialMenuItem(
+      this.widget.id, this.widget.descriptor.shortText, this.widget.descriptor.icon);
+    this.dialService.dialProxy.addItem(dialMenuVoice);
+  }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Una volta aggiunta la voce di Menu al Dial, essa potrá essere selezionata attraverso il metodo Inkove messo a disposizione dalla classe DialController. Il metodo Invoke per acquisire una voce di menu, potrá essere richiamato sia attraverso il menu contestuale del Dial che compare nello schermo, che tramite un nostro metodo chiamato appunto ManualInvoke che esegue questa azione manualmente, richiamando tramite Web il medesimo metodo, solamente se quella voce di menu é presente tra quelle disponibile nel Dial.
+In questo modo, il Widget non dovrá fare altro che mettersi in ascolto del metodo onInvokeEvent, il quale quando richiamato, restituisce una stringa definita “tag”, rappresentante la voce Menu acquisita.
+Se quel tag, corrisponde all’id del Widget in ascolto, significa che l’utente ha richiesto il controllo di quel determinato Widget.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Ascolto Invoke della voce di menu'},style=javaScriptCode]
+  this.dialService.dialFrontendBridge.onInvokeEvent.subscribe(tag => {
+        if (tag === this.widget.id) {
+          this.isActive = true;
+          this.dialService.widget = this.widget.id;
+          this.widgetDialStart();
+          this.dialService.dialProxy.manualInvoke(this.channels[0].parameter.value);
+        }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Una volta acquisito il controllo del Widget, bisognerá mettersi in ascolto delle funzioni richiamabili dal Dial, attraverso gli eventEmitter messi a disposizione dalla classe DialFrontndBridge, e implementare il comportamento di quel Widget all’emissione di determinati eventi come la Rotazione o il Click.
+
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Ascolto eventi associati alla voce di menu' selezionata},style=javaScriptCode]
+const rotation = this.dialService.dialFrontendBridge.onRotationEvent.subscribe(
+	({ tag, degree }) => {
+      // Azione associata all'evento rotazione del Dial.
+      if (tag === this.channels[this.currentChannel].parameter.value) {
+        this.setSetterAtIndex(this.currentChannel, 
+        parseNumber(degree)* this.moltiplicator
+        );
+      }
+    });
+
+const click = this.dialService.dialFrontendBridge.onClickEvent.subscribe(
+	(tag) => {
+      // Azione associata all'evento click del Dial.
+      if(tag === this.channels[this.currentChannel].parameter.value){
+          this.setChannelValue(this.channels[this.currentChannel].parameter.code,
+          this.getNumberSetterComponent(this.currentChannel).value);
+        }
+    });
+
+const pressRot = this.dialService.dialFrontendBridge.onPressedRotationEvent.subscribe(
+({ tag, degree }) => {
+      // Azione associata all'evento rotazione con pressione del Dial.
+      if (tag === this.channels[this.currentChannel].parameter.value) {
+        this.setSetterAtIndex(
+        this.currentChannel, 
+        parseNumber(degree) * this.moltiplicator
+        );
+        this.setChannelValue(this.channels[this.currentChannel].parameter.code,
+        this.getNumberSetterComponent(this.currentChannel).value);
+      }
+    });
+    this.channelDialSubscriptions?.unsubscribe();
+    this.channelDialSubscriptions = new Subscription();
+    this.channelDialSubscriptions.add(rotation).add(click).add(pressRot);
+\end{lstlisting} 
+\vspace{1.0cm}
+
+
+I metodo sopra implementati, permettono di eseguire una determinata azione quando viene richiamato un metodo presente in DialFrontendBridge come la rotazione o la pressione combinata alla rotazione, che permette quindi nel caso dell'acquisizione tramite il contatto del Dial sullo schermo, mantenendo il controllo e il relativo comportamento, anche appoggiandolo sulla scrivania, evitano il pericolo che nel tratto in cui é il dispositivo si trova sospeso, possano avvenire chiamate pericolose.
+
 \section{Testing}
+
+Per quanto riguarda i test svolti in ambito UWP abbiamo utilizzato MSTest fornito da Microsoft all’interno di Visual Studio per testare le funzionalitá messe a disposizione dalla classe RadialController.
+
+\section{MSTest}
+Visual Studio Unit Testing Framework descrive la suite di strumenti di unit test di Microsoft integrata in alcune versioni di Visual Studio 2005 e successive.
+Qui sotto sono riportati due tra i vari test implementati nel progetto:
+ 
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Test SetMenu},style=javaScriptCode]
+    [UITestMethod]
+        public void TestSetMenu()
+        {
+            Assert.IsFalse(radialController.Menu.Items.Count > 0);
+            DialMenuItem item1 = dialController.CreateDialMenuItem("tag1", "d", "icon");
+            DialMenuItem item2 = dialController.CreateDialMenuItem("tag2", "d", "icon");
+            DialMenuItem item3 = dialController.CreateDialMenuItem("tag3", "d", "icon");
+            DialMenuItem item4 = dialController.CreateDialMenuItem("tag4", "d", "icon");
+            List<DialMenuItem> items = new List<DialMenuItem>();
+            items.Add(item1);
+            items.Add(item2);
+            items.Add(item3);
+            items.Add(item4);
+            dialController.SetMenu(items);
+            Assert.IsTrue(radialController.Menu.Items.Count == 4);
+        }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Test aggiunta voce di Menu'},style=javaScriptCode]
+  [UITestMethod]
+        public void TestAddItem(){
+            Assert.IsFalse(radialController.Menu.Items.Count > 0);
+            dialController.AddItem(dialController.CreateDialMenuItem("tag", "d", "icon"));
+            Assert.IsTrue(radialController.Menu.Items.Count > 0);
+        }
+\end{lstlisting} 
+\vspace{1.0cm}
