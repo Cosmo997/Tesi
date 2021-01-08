@@ -1,15 +1,15 @@
-\chapter{Architettura}
-\label{chap:arch}
-
+\chapter{Servizio}
+\label{chap:serv}
+Preambolo
 In questo capitolo verrá esposta l'architettura finale dell'applicativo sviluppato che permette la comunicazione tra il Surface Dial e la pagina web.\\
-
+\section{Architettura Software}
 Il progetto si presenta suddiviso in due parti ben distinte:
 \begin{itemize}
 \item \textbf{Servizio Angular}.
 \item \textbf{Applicazione UWP} (Universal Windows Plaform).
 \end{itemize}
 
-\section{Servizio Angular}
+\subsection{Servizio Angular}
 In Angular, i Servizi rappresentano un tassello fondamentale per la realizzazione di un'applicazione. Un servizio è solitamente rappresentato da una classe indipendente dalla View che viene definita per svolgere un compito ben preciso ed effettuare delle operazioni strettamente correlate tenendo in mente il principio di singola responsabilità.\\
 È possibile definire più servizi all'interno di un'applicazione, ognuno dei quali si occupa di portare a termine un determinato incarico incrementando la modularitá del progetto, inoltre un servizio puó a sua volta dipendere da altri servizi, che vengono definiti nel costruttore del servizio stesso.\\
 
@@ -31,7 +31,7 @@ Per ogni Injector esiste sempre una sola istanza di un determinato servizio, com
 L’ Injector si occupa di creare le dipendenze e si serve di un Provider, un oggetto il quale indica all'Injector come ottenere o creare un'istanza di una dipendenza.
 Per ogni dipendenza che si vuole usare nell'applicazione si deve registrare un provider con un Injector, in modo che quest'ultimo possa poi utilizzare il provider per creare nuova istanza di quella dipendenza.
 
-\subsection{Singleton services}
+\subsubsection{Singleton services}
 
 Per restare in linea con le direttive utilizzare dal gruppo Loccioni nello sviluppo dei loro servizi, abbiamo utilizzato il forRoot() pattern per l’injection del servizio nell’applicazione.\\
 
@@ -39,7 +39,7 @@ Questo pattern permette di specificare un modulo personalizzato per il servizio,
 
 Questo pattern permette di effettuare l’import del modulo nell’AppModule richiamando il metodo forRoot(), cosi da non dover appesantire il Provider del modulo iniziale e in linea di principio é bene utilizzarlo quando un provider prende in ingresso dei parametri, così da non dover specificarli ogni qualvolta il modulo venga utilizzato.
 
-\subsection{DialService}
+\subsubsection{DialService}
 
 Lo scopo finale del servizio che abbiamo implementato é quello di poterlo utilizzare come ponte o intermediario tra il Surface Dial, che si interfaccia nativamente con l'applicazione UWP, la quale contiene una WebView con all'interno caricata una pagina custom Loccioni, e i componenti della View all'interno della pagina che intendono utilizzare il servizio.\\
 
@@ -55,7 +55,7 @@ Il core del servizio implementato è rappresentato dalla Classe DialService, ess
 
 L'oggetto dial viene poi inserito per questioni di sicurezza in una classe DialProxy, la quale implementa a sua volta l'interfaccia da noi sviluppata DialBackendBridge, nella quale sono presenti tutte le funzionalitá dell'oggetto "dial", richiamabili quindi da Web.
 
-\subsection{DialProxy}
+\subsubsection{DialProxy}
 
 Al fine di aggiungere un livello di sicurezza sull’oggetto iniettato e sul suo successivo utilizzo, abbiamo deciso di implementare una classe chiamata DialProxy con la responsabilitá di wrappare l’oggetto e quindi di intercettare le chiamate fatte su di esso.\\
 
@@ -68,7 +68,7 @@ La classe DialProxy prende quindi in ingresso nel suo costruttore un oggetto di 
 \vspace{1.0cm}
 
 \newpage
-\subsection{DialBackendBridge}
+\subsubsection{DialBackendBridge}
 
 DialBeckendBridge rappresenta l'interfaccia contenente la dichiarazione dei metodi implementati nella classe DialController dell'applicazione UWP.\\
 In questo modo, tramite l'oggetto dial iniettato, sará possibile richiamare a RunTime i metodi dichiarati nel C\# attraverso il Web.\\
@@ -98,7 +98,7 @@ export interface DialBackednBridge{
 \vspace{1.0cm}
 
 \newpage
-\subsection{DialFrontendBridge}
+\subsubsection{DialFrontendBridge}
 
 Per rendere questa comunicazione bi-direzionale, abbiamo creato una classe DialFrontendBridge con la responsabilitá di rendere visibili dei metodi all'interno dell'oggetto window e quindi richiamabili tramite script dall'applicazione UWP.\\
 
@@ -196,7 +196,7 @@ Affinché questi metodi possano essere richiamati tramite script dall'applicazio
 \end{lstlisting} 
 \vspace{1.0cm}
 
-\subsection{DialMenuLoader}
+\subsubsection{DialMenuLoader}
 
 Il secondo servizio implementato, chiamato DialMenuLoader é un perfetto esempio di come usufruire del servizio DialService all'interno di Componenti o Servizi.\\
 
@@ -364,7 +364,7 @@ private menuSubscribe(){
 \end{lstlisting} 
 \vspace{1.0cm}
 
-\subsection{Widget}
+\subsubsection{Widget}
 
 Un widget Aulos è un componente in esecuzione all’interno di una DashBoard con lo scopo di rappresentare o modificare i dati ottenuti dal backend collegato fisicamente ad una macchina.\\
 
@@ -401,7 +401,7 @@ Analogamente all'evento sopra mostrato, chiamato onRotationEvent, gli eventi al 
 
 Durante la sua inizializzazione, il widget si sottoscrive all'evento di Invoke, con lo scopo di intercettare il tag sul quale viene richiamato il medesimo metodo dal Dial. Successivamente, se l'invoke richiamato restituisce il tag corrispondente all'ID del Widget in ascolto, viene pulito il menu del dial e vengono caricate le voci di menu inerenti ai canali collegati a quel determinato Widget cosi da poter essere richiamati e intercettati a loro volta dalla sottoscrizione all'evento onInvokeEvent.
  
-\section{Applicazione UWP}
+\subsection{Applicazione UWP}
 
 La seconda parte, invece, è costituita da un’ applicazione UWP ovvero Universal Windows Platform, presa in considerazione poiché la più recente tra i framework Microsoft e tra le sue caratteristiche troviamo la sicurezza e la portabilità tra le diverse piattaforme windows, ciò consente un maggiore supporto nel tempo e intercambiabilità tra i dispositivi dove utilizzarla.\\
 
@@ -416,7 +416,7 @@ Di conseguenza abbiamo creato due diverse soluzioni:
 \item \textbf{EmbeddedBrowserView:} Contiene la parte runtime del progetto e effettua l’injection dell’oggetto nella pagina Web.
 \end{itemize}
 
-\subsection{Core}
+\subsubsection{Core}
 
 Nel Core è contenuta la parte del progetto UWP che non richiede la partenza a runtime e comprende le seguenti classi:
 
@@ -428,13 +428,13 @@ Nel Core è contenuta la parte del progetto UWP che non richiede la partenza a r
 \item DialMenuItem
 \end{itemize}
 
-\subsection{AulosCollection e AulosIcon}
+\subsubsection{AulosCollection e AulosIcon}
 
 Queste due classi si occupano, insieme al main, della parte riguardante le icone che verranno poi visualizzate nel menu del Dial. All’avvio dell’applicazione nella classe main viene effettuata una chiamata GET ad un eventuale server Loccioni che consente di ricevere un file JSON contenente una mappa “nome”-”FontGlyph” che verrà poi utilizzato per creare un DialMenuItem insieme al Font Aulos creato da Loccioni.\\
 
 L’utilizzo di questo approccio consente una maggiore facilità nella sostituzione delle icone, che non dipende dalle risorse dell’applicazione stessa ma da un server Loccioni.
 
-\subsection{DialController}
+\subsubsection{DialController}
 
 La classe DialController è una tra le più importanti poiché una sua istanza verrà poi inserita all’interno della WebView e servirà al servizio DialService per la comunicazione Web-UWP. I metodi pubblici al suo interno sono gli stessi dell’interfaccia DialBackendBridge che vengono utilizzati appunto tramite l’oggetto iniettato inizialmente.\\
 
@@ -442,18 +442,27 @@ Al suo interno troviamo un’ istanza della classe RadialController, ovvero la l
 
 Nel costruttore abbiamo assegnato agli eventi presenti nella classe RadialController il relativo handler nella classe WebNotifier, in questo modo ogni volta che verrà emesso un determinato evento la pagina web riceverà una notifica e verrà svolta la funzione associata a quella determinata voce di menù.
 
-\subsection{WebNotifier}
+\subsubsection{WebNotifier}
 
 La classe WebNotifier contiene al suo interno una istanza della WebView ed ha come responsabilità quella di fornire i metodi che verranno poi utilizzati come EventHandler per gli eventi forniti dalla classe RadialController, in modo tale da riuscire a comunicare, attraverso la WebView al suo interno, alla pagina web l’emissione dell’evento stesso.\\
 
 Al suo interno è presente anche un oggetto della classe CoreWindow utilizzato per spostare la posizione del mouse sullo schermo al primo contatto del Dial sulla superficie.
 
-\subsection{DialMenuItem}
+\subsubsection{DialMenuItem}
 
 La classe DialMenuItem è una classe “modello” utilizzata per rappresentare un elemento contenuto nel Menu del Dial.
 
-\subsection{MainPage}
+\subsubsection{MainPage}
 
 Nella Main Page avviene l’inizializzazione dei componenti RadialController e la navigazione alla pagina web desiderata.\\
 
 All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObject che ci permette, una volta caricata la pagina, di iniettare l’oggetto della classe DialController per la comunicazione.
+
+\section{Funzionalità implementate}
+
+\subsection{Aquisizione widget}
+\subsection{Posizionamento su schermo}
+\subsection{Feedback aptico}
+\subsection{Variazione degree personalizzata}
+\section{Utilizzo del Servizio}
+\section{Testing}

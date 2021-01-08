@@ -15,3 +15,62 @@ L'esposizione di questo elaborato sará cosi suddivisa:
 - il capitolo n "nome" descrive bla bla bla
 - il capitolo n "nome" descrive bla bla bla
 - il capitolo n "nome" descrive bla bla bla
+
+\section{Analisi e Studio di Fattibilità}
+
+Nel nostro primo incontro con l'impresa Loccioni siamo stati accompagnati dal nostro tutor aziendale, Luca Mazzuferi, nelle varie aree dell'impresa per verificare dove il Dial possa effettivamente aiutare l'operatore nelle azioni quotidiane per la calibrazione o la modifica di dati in modo efficiente e sicuro, migliorandone la user experience.\\
+
+L'idea iniziale era quella di utilizzare il Dial per il controllo di macchinari, che attualmente fanno uso di programmi Windows Forms per la manipolazione dei dati, mentre si appoggiano ad un loro Framework Web per la visualizzazione in tempo reale dei dati stessi.\\
+
+Per prima cosa ci siamo dedicati alla lettura della documentazione scritta da Microsoft e siamo giunti alla conclusione che le funzionalità base del Dial sono quattro eventi principali:
+
+\begin{itemize}
+\item \textbf{Click}: Pressione rapida del bottone presente nel dispositivo.
+\item \textbf{Pressione prolungata}: Pressione prolungata del bottone presente nel dispositivo.
+\item \textbf{Rotazione}: Evento rotazione che avviene ruotando il dispositivo
+\item \textbf{Posizionamento sullo schermo}: Il dispositivo può essere appoggiato in alcuni schermi compatibili ed essere riconosciuto dal sistema.
+\end{itemize}
+
+Una volta individuate le potenzialità del Dial, abbiamo iniziato una fasi di testing su applicazioni native per comprendere come e dove potevamo utilizzare le librerie messe a disposizione per il dispositivo, con la successiva creazione di un piccolo prototipo che sfruttasse e mostrasse le suddette funzionalità.\\
+
+Successivamente ci siamo dedicati alla comunicazione tra un qualsiasi tipo di ambiente software e il Dial, scoprendo che il dispositivo comunica attraverso il protocollo HID con qualsiasi Hardware, ma senza l'utilizzo della Libreria RadialController, si vanno a perdere tutte quelle funzionalità che permettono 4 l'utilizzo completo del Dial, rendendolo meno necessario in termini di miglioramento della User Experience.
+ 
+\newpage
+\subsection{Ricerca}
+
+Durante lo studio di fattibilità, ci siamo dedicati alla ricerca di progetti che utilizzassero il Dial indifferentemente dall’ambiente, da quello grafico a quello audio, trovando solamente un programma che permetteva l'utilizzo del Dial in un Sintetizzatore Software, attraverso il protocollo MIDI, limitando il controllo alla semplice rotazione e pressione, togliendo tutte quelle funzionalità più interessanti, come il posizionamento del dispositivo sullo schermo e la visualizzazione dinamica del Menu in relazione alla posizione in cui trova.\\
+
+Per questo motivo, abbiamo deciso in concordato con i nostri tutor Aziendali di non gestire noi la comunicazione tra dispositivo e software, ma di lasciare questo compito alle librerie messe a disposizione da Microsoft.
+
+Dato il crescente sviluppo dell'utilizzo di applicazioni web e del relativo controllo delle stesse attraverso dispositivi HID, abbiamo quindi proseguito con la ricerca per l'integrazione dei suddetti dispositivi nel mondo Web, accantonando per il momento, la possibilitá di integrarlo negli applicativi Windows Forms Loccioni, anche a causa del necessario refactoring di tutte le applicazioni che intendessero utilizzarlo.\\
+
+Considerando che il posizionamento su schermo è supportato solamente da determinati dispositivi Microsoft ( Surface Studio, Surface Pro 4/5/6, ...) abbiamo pensato di creare un’applicazione UWP (Universal Windows Platform) che potesse girare nativamente su tali dispositivi. Per poter infine, acquisire il controllo di una pagina web, abbiamo deciso di utilizzare una WebView avviata a RunTime permettendo all'utente di poter utilizzare il Dial sui dispositivi che supportano l'interazione con lo schermo grazie alle Librerie Native, ma anche di poterla utilizzare senza l'utilizzo del Dial, attraverso un qualsiasi browser web.
+
+\newpage
+\subsection{Problematiche riscontrate}
+
+Una volta avvenuto il caricamento della pagina Web nell'applicazione UWP, ci rimaneva da risolvere il problema della comunicazione tra due linguaggi differenti, quello Web, nel nostro caso, basato sul TypeScript e quello UWP interamente in C e XAML.\\
+
+Le comunicazioni dovevano avvenire in maniera bi-direzionale, questo significa che non é solamente l'applicazione UWP a comunicare con la pagina Web, ma anche viceversa. Affinché l'applicazione potesse comunicare con la pagina Web, grazie alla funzionalità InvokeScriptAsync, messa a disposizione dalla WebView, abbiamo definito delle chiamate asincrone che potessero inviare parametri o notificare l'avvenuta emissione di un evento alla pagina Web stessa. Il problema era come poter comunicare dalla pagina Web all'applicazione UWP che fosse avvenuto qualcosa.\\
+
+Per risolvere questa problematica ci siamo trovati davanti a due possibilitá:
+
+\begin{enumerate}
+\item Utilizzare la funzionalitá della WebView chiamata ScriptNotify che permette la notifica all'applicazione UWP dell'avvenuta emissione di un determinato evento nella pagina Web.
+\item Utilizzare il decoratore AllowForWeb su una classe, affinché un'istanza di essa, possa essere iniettata nella pagina Web.
+\end{enumerate}
+
+Dopo aver letto la documentazione e effettuato vari test, la scelta è ricaduta sul decoratore AllowForWeb, in quanto lo ScriptNotify permetteva di mettersi in ascolto di solamente un determinato evento e permetteva il ritorno di una sola stringa come parametro, oltre al fatto che leggendo su varie Community come StackOverflow, venisse sconsigliata questa pratica poiché non sicura in quanto andava necessariamente abilitato lato UWP l'URI di ogni singola pagina da controllare e limitante in termini di prestazioni.\\ 
+
+In contrapposizione, utilizzare AllowForWeb su di una classe e iniettare un'istanza nella pagina, ci permetteva un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.\\ 
+
+A quel punto l’unico problema rimasto era l’utilizzo di questo oggetto all’interno del Framework Aulos Loccioni, che abbiamo però risolto attraverso lo sviluppo di un servizio Angular che aggiunge livelli di sicurezza e definisce delle API di utilizzo per gli sviluppatori futuri che vorranno integrare l'utilizzo del Dial nelle proprie pagine Web.
+
+
+
+
+
+
+
+
+
