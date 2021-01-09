@@ -143,11 +143,9 @@ Affinché questi metodi possano essere richiamati tramite script dall'applicazio
 
 \subsubsection{Widget}
 
-TODO: DA COMPLETARE
-
 Un widget Aulos è un componente in esecuzione all’interno di una DashBoard con lo scopo di rappresentare o modificare i dati ottenuti dal backend collegato fisicamente ad una macchina.\\
 
-Nella nostra applicazione abbiamo modificato degli Widgets giá esistenti, utilizzando all'interno di essi il nostro servizio \emph{DialService}, allo scopo di renderli controllabili attraverso il Dial.Siamo partiti tentando di agganciarsi ad un semplice Widget che visualizza un range di possibili valori rappresentato da uno \emph{slider grafico}, con l'intento di variare, anche solo graficamente, il valore corrente attraverso l'evento rotazione del Dial.\\
+Nella nostra applicazione abbiamo modificato degli Widgets giá esistenti del gruppo Loccioni, utilizzando all'interno di essi il nostro servizio \emph{DialService}, con lo scopo di renderli controllabili attraverso il Dial. Siamo partiti tentando di agganciarsi ad un semplice Widget che visualizzasse un range di possibili valori rappresentato da uno \emph{slider grafico} e da un \emph{Radial Gauge}, con l'intento di variare, anche solo graficamente, il valore corrente attraverso l'evento rotazione del Dial.\\
 
 \begin{lstlisting}[caption={Sottoscrizione evento rotazione},style=javaScriptCode]
 if (this.widget.runMode){
@@ -164,53 +162,47 @@ if (this.widget.runMode){
 }
 \end{lstlisting} 
 
-La stessa cosa è stata fatta per un widget rappresentato graficamente da un \emph{Radial Gauge}, fino ad arrivare a modificare valori lato Backend attraverso il DialChannelWidget, un widget creato da noi che contiene al suo interno , al contrario degli widget già presenti, il collegamento a \emph{N} diversi canali modificabili.
+Successivamente, abbiamo creato un Widget chiamato ChannelDialWidget, un widget contenente al suo interno, al contrario di quelli sopra citati, il collegamento a \emph{N} diversi canali collegati ad un endopoint nel backend, permettendo non solo la lettura, ma anche la modifica effettiva della persistenza dei dati.
 Questo ci ha permesso di sviluppare delle funzionalità custom per quel determinato Widget al fine di poterne acquisire il controllo, e scegliere canale per canale, il valore da settare, permettendo la variazione non solo grafica ma anche effettiva dei dati mostrati.\\
 
-Per rendere sicura queste funzionalità abbiamo previsto la variazione dei valori con la singola rotazione e la successiva modifica lato backend qualora il dial venga premuto, altrimenti attraverso la funzionalità combinata di pressione e rotazione, così da evitare una involontaria modifica nel momento della presa possesso.\\
+Per rendere sicure queste funzionalità abbiamo previsto la variazione grafica dei valori con la singola rotazione e la successiva modifica lato backend solamente qualora il dial venga premuto, altrimenti attraverso la funzionalità combinata di pressione e rotazione, così da evitare una involontaria modifica nel momento della presa possesso del widget o nella fase di transizione tra l'acquisizione su schermo e il successivo utilizzo su un piano di lavoro.\\
 
 Analogamente all'evento sopra mostrato, chiamato onRotationEvent, gli eventi al quale il widget ChannelDialWidget si sottoscrive al fine di variare i valori di un canale selezionato, sia graficamente che in modo permanente lato backend, sono i seguenti:
 
 \begin{itemize}
-\item \textbf{onRotationEvent} 
-\item \textbf{onClickEvent} 
-\item \textbf{onPressedRotationEvent}
+\item \emph{onRotationEvent} 
+\item \emph{onClickEvent} 
+\item \emph{onPressedRotationEvent}
 \end{itemize}
 
-Durante la sua inizializzazione, il widget si sottoscrive all'evento di Invoke, con lo scopo di intercettare il tag sul quale viene richiamato il medesimo metodo dal Dial. Successivamente, se l'invoke richiamato restituisce il tag corrispondente all'ID del Widget in ascolto, viene pulito il menu del dial e vengono caricate le voci di menu inerenti ai canali collegati a quel determinato Widget cosi da poter essere richiamati e intercettati a loro volta dalla sottoscrizione all'evento onInvokeEvent.
+Durante la sua inizializzazione, il widget si sottoscrive all'evento di Invoke, con lo scopo di intercettare il tag sul quale viene richiamato il medesimo metodo dal Dial. Successivamente, se l'evento invoke richiamato restituisce il tag corrispondente all'ID del Widget in ascolto, viene pulito il menu del dial e vengono caricate le voci di menu inerenti ai canali collegati a quel determinato Widget cosi da poter essere richiamati e intercettati a loro volta dalla sottoscrizione all'evento onInvokeEvent.
  
 \subsection{Applicazione UWP}
 
-La seconda parte, invece, è costituita da un’ applicazione UWP ovvero Universal Windows Platform, presa in considerazione poiché la più recente tra i framework Microsoft e tra le sue caratteristiche troviamo la sicurezza e la portabilità tra le diverse piattaforme windows, ciò consente un maggiore supporto nel tempo e intercambiabilità tra i dispositivi dove utilizzarla.\\
+Il secondo componente del progetto è costituito da un'applicazione UWP (Universal Windows Platform), presa in considerazione poiché la più recente tra i framework Microsoft e tra le sue caratteristiche troviamo la sicurezza e la portabilità tra le diverse piattaforme Windows, ciò consente un maggiore supporto nel tempo e intercambiabilità tra i dispositivi dove utilizzarla. L'eseguibile sviluppato prende il nome di \textbf{DialBridge}.\\
+
+\subsubsection{DialBridge}
 
 L’applicazione DialBridge ha come responsabilità quella di comunicare con il Dispositivo HID attraverso le librerie fornite da Microsoft e allo stesso tempo comunicare con la pagina Web contenuta al suo interno.\\
 
-Inizialmente abbiamo creato un’unica soluzione contenente sia la Web View che il Core dell’applicazione, ma abbiamo riscontrato un problema nell’injection dell’oggetto utilizzato per la comunicazione Web-UWP, poichè esso deve necessariamente essere iniettato a runtime.\\
+Inizialmente abbiamo creato un'unica soluzione contenente sia la WebView che il Core dell'applicazione, ma abbiamo riscontrato un problema nell’injection dell'oggetto utilizzato per la comunicazione Web-UWP, poichè esso deve necessariamente essere iniettato a runtime.\\
 
 Di conseguenza abbiamo creato due diverse soluzioni:
 
 \begin{itemize}
 \item \textbf{Core:} Contiene il nucleo dell’applicazione.
-\item \textbf{EmbeddedBrowserView:} Contiene la parte runtime del progetto e effettua l’injection dell’oggetto nella pagina Web.
+\item \textbf{EmbeddedBrowserView:} Contiene la parte runtime del progetto\\ che 			effettua l’injection dell’oggetto nella pagina Web.
 \end{itemize}
 
 \subsubsection{Core}
 
-Nel Core è contenuta la parte del progetto UWP che non richiede la partenza a runtime e comprende le seguenti classi:
+Nel Core è contenuta la parte del progetto UWP che non richiede l'avvio a runtime e comprende le seguenti classi:
 
 \begin{itemize}
-\item AulosCollection
-\item AulosIcon
 \item DialController
 \item WebNotifier
 \item DialMenuItem
 \end{itemize}
-
-\subsubsection{AulosCollection e AulosIcon}
-
-Queste due classi si occupano, insieme al main, della parte riguardante le icone che verranno poi visualizzate nel menu del Dial. All’avvio dell’applicazione nella classe main viene effettuata una chiamata GET ad un eventuale server Loccioni che consente di ricevere un file JSON contenente una mappa “nome”-”FontGlyph” che verrà poi utilizzato per creare un DialMenuItem insieme al Font Aulos creato da Loccioni.\\
-
-L’utilizzo di questo approccio consente una maggiore facilità nella sostituzione delle icone, che non dipende dalle risorse dell’applicazione stessa ma da un server Loccioni.
 
 \subsubsection{DialController}
 
@@ -234,33 +226,34 @@ La classe DialMenuItem è una classe “modello” utilizzata per rappresentare 
 
 Nella Main Page avviene l’inizializzazione dei componenti RadialController e la navigazione alla pagina web desiderata.\\
 
-All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObject che ci permette, una volta caricata la pagina, di iniettare l’oggetto della classe DialController per la comunicazione.
+All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObject che ci permette, di iniettare l’oggetto della classe DialController durante il caricamento, passandogli come parametri una stringa rappresentate il nome dell'oggetto, con il quale potrá essere intercettato lato Web e l'istanza dell'oggetto da iniettare.
 
-\section{Funzionalità implementate}
+\begin{lstlisting}[caption={Injection oggetto C\#},style=javaScriptCode]
+webView.AddWebAllowedObject("dial", dial);
+\end{lstlisting}
 
-\subsection{Aquisizione widget}
-\subsection{Posizionamento su schermo}
+\section{Posizionamento su schermo}
 
-Uno dei maggiori vantaggi dell’utilizzo di un surface Dial è la possibilità di posizionarlo sopra uno schermo compatibile e di cambiare il suo funzionamento in base alla posizione utilizzata.
-Questa funzionalità è gestita dal sistema operativo e comunica solamente con elementi nativi UWP, considerando ciò, abbiamo cercato un servizio Angular che ci permettesse di svolgere la stessa funzione all’interno di una pagina web ma senza risultati.
+Uno dei maggiori vantaggi dell’utilizzo di un surface Dial è la possibilità di posizionarlo sopra uno schermo compatibile e di variare il suo funzionamento in base alla posizione utilizzata.
+Questa funzionalità è gestita dal sistema operativo e comunica solamente con elementi nativi UWP e con  display touch-screen compatibili ( Surface Pro 4/6/7 e Sruface Studio).
+
 \begin{figure}[htpb!]
   \centering
   \includegraphics[width=0.5\textwidth]{DialSchermo}
   \caption{Microsoft Dial posizionato sopra un surface pro 6}
 \end{figure}
-Inizialmente abbiamo preso in considerazione la possibilitá di suddividere il layout dell’applicazione nativa in N riquadri, all’interno dei quali avremo posizionato il relativo Widget da controllare. Questa soluzione presenta peró delle limitazioni, in quanto in base alla risoluzione del dispositivo utilizzato, i widget caricabili in ogni riquadro del layout erano limitati al numero di riquadri definiti dall’applicazione UWP.
+Inizialmente abbiamo preso in considerazione la possibilitá di suddividere il layout dell’applicazione nativa in N riquadri, all’interno dei quali avremo posizionato il relativo Widget da controllare. Questa soluzione presentava peró delle limitazioni, in quanto in base alla risoluzione del dispositivo utilizzato, i widget caricabili in ogni riquadro del layout erano limitati al numero di riquadri definiti dall'applicazione UWP.\\
+Abbiamo quindi cercato una soluzione, che spostasse la responsabilitá di acquisire il posizionamento lato Web anziché lato UWP, implementando una soluzione che ci permettesse di avere un numero variabile di Widget configurabili nella Dashboard e la successiva acquisizione di essi.\\
 
-Abbiamo quindi cercato una soluzione, che spostasse la responsabilitá di acquisire il posizionamento lato Web anziché lato UWP. Dopo vari tentativi, abbiamo escogitato una soluzione che ci permettesse di avere un numero variabile di Widget configurabili nella Dashboard e la successiva acquisizione di essi, per fare ciò abbiamo sfruttato
-Analizzando gli eventi richiamabili dalla classe RadialController, in particolare quelli inerenti al contatto con lo schermo, abbiamo notato prendevano in ingresso un oggetto di tipo RadialControllerScreenContact fornitogli dalla Libreria. Questo oggetto possiede due attributi relativi al Posizionamento ( Position ) e al Bound ( Bounds ) del rettangolo generato dal Dial sullo schermo.
+Analizzando gli eventi richiamabili dalla classe RadialController, in particolare quelli inerenti al contatto con lo schermo, abbiamo notato che prendevano come parametro in ingresso un oggetto di tipo \emph{RadialControllerScreenContact} fornitogli dalla Libreria. 
+Questo oggetto possiede due attributi relativi al Posizionamento ( Position ) e al Bound ( Bounds ) dall'area del rettangolo generato dal Dial sullo schermo.
 
 Grazie all’attributo Position di tipo Point, é possibile ottenere, attraverso le coordinate X e Y, il punto centrale nel quale il Dial é posizionato.
 
 \vspace{1.0cm}
 \begin{lstlisting}[caption={Metodo ScreenContactStartedAsync},style=javaScriptCode]
  internal async Task ScreenContactStartedAsync(
- 	RadialControllerScreenContactStartedEventArgs args
- )
-  {
+ 	RadialControllerScreenContactStartedEventArgs args){
     this.simpleHaptics = args.SimpleHapticsController;
     string x = args.Contact.Position.X.ToString();
     string y = args.Contact.Position.Y.ToString();
@@ -279,16 +272,16 @@ Grazie all’attributo Position di tipo Point, é possibile ottenere, attraverso
 \end{lstlisting} 
 \vspace{1.0cm}
 
-
-Attraverso la libreria Window.UI.Core é possibile spostare il cursore in un punto definito della UI corrente. Per questo motivo, la classe WebNotifier presente un attributo private e readonly chiamato window, un oggetto di tipo WindowCore che permette di intercettare eventi relativi ai dispositivi di Input utilizzati ma anche di posizionare il cursore del dispositivo in una posizione specifica in base alle coordinate passategli. In questo modo, attraverso l’attributo PointerPosition siamo stato in grado di creare un nuovo oggetto di tipo Point con le coordinate X e Y acquisite dal Dial consentendoci di posizionare il cursore in quel determinato punto.
+Attraverso la libreria Window.UI.Core é possibile spostare il cursore in un punto definito della UI corrente. Per questo motivo, la classe WebNotifier presenta un attributo private e readonly chiamato window, un oggetto di tipo WindowCore che permette di intercettare eventi relativi ai dispositivi di Input utilizzati e di posizionare il cursore del mouse in una posizione specifica in base alle coordinate passategli. In questo modo, attraverso l’attributo PointerPosition abbiamo creato un nuovo oggetto di tipo Point con le coordinate X e Y acquisite dal Dial consentendoci di posizionare il cursore in quel determinato punto.
 \vspace{1.0cm}
 \begin{lstlisting}[caption={Spostamento cursore},style=javaScriptCode]
   window.PointerPosition = new Point(args.Contact.Position.X, args.Contact.Position.Y);
 \end{lstlisting} 
 \vspace{1.0cm}
-Questa soluzione ci ha permesso di spostare dinamicamente il cursore nella posizione centrale al disotto del Dial quando viene posizionato sopra lo schermo così da poter intercettare lato Web la posizione del cursore e permettere agli utilizzatori del servizio di riprodurre il comportamente appropriato per il Widget sopra il quale ci si posiziona.
-Abbiamo quindi previsto nel Template HTML del Widget un metodo OnMouseOver che venisse richiamato solamente qualora il Dial fosse effettivamente a contatto con lo schermo, ma il semplice spostamento del cursore nella nuova posizione non richiamava correttamente il metodo in quanto il cursore non effettuava un movimento, ma veniva ricreato in quella determinata posizione.
-Affinché la soluzione ideata funzionasse correttamente abbiamo importato una libreria chiamata Windows.UI.Input.Preview.Injection che mette a disposizione funziolitá per la simulazione di eventi di input.
+Questa soluzione permette di spostare dinamicamente il cursore nella posizione centrale al disotto del Dial quando viene posizionato sopra lo schermo, così da poter intercettare lato Web la posizione esatta del cursore e permettere agli utilizzatori del servizio di riprodurre il comportamento appropriato per il Widget sopra il quale ci si posiziona.\\
+
+Abbiamo quindi previsto nel Template HTML del Widget un metodo \emph{OnMouseOver} che venisse richiamato solamente qualora il Dial fosse effettivamente a contatto con lo schermo, ma il semplice spostamento del cursore nella nuova posizione non richiamava correttamente il metodo in quanto il cursore non effettuava un movimento, ma veniva ricreato in quella determinata posizione.
+Affinché la soluzione ideata funzionasse correttamente abbiamo importato una libreria chiamata Windows.UI.Input.Preview.Injection che mette a disposizione funziolitá per la simulazione di eventi di input.\\
 
 Una volta posizionato il cursore nella nuova posizione, siamo stati in grado di simulare un impercettibile movimento del cursore di un singolo pixel, grazie al quale ci é stato possibile intercettare correttamente l’evento OnMouseMove dichiarato nel Template del Widget eseguendo il metodo associato.
 
@@ -298,8 +291,97 @@ inputInjector.InjectMouseInput(new[] { inputInfo });
 inputInfo.MouseOptions = InjectedInputMouseOptions.Move;
 inputInfo.DeltaY = 1;
 \end{lstlisting} 
+\vspace{1.0cm} 
+
+\section{Funzionalità implementate}
+
+In questa sezione vengono dettagliate le funzionalità aggiuntive implementate al progetto successivamente al periodo di Stage++ nell'impresa Loccioni.
+
+\subsection{Aquisizione widget}
+
+Inizialmente abbiamo riscontrato che la dashboard non tiene traccia di quale Widget é attualmente utilizzato, in quanto il componente Widget possiede solamente l'attributo \textbf{runMode} che viene impostato a \emph{false} una volta caricato nella Dashboard relativamente alla fase di configurazione e successivamente a \emph{true} una volta avviata la fase di run della Dashboard. Per ovviare a questo problema abbiamo aggiunto una responsabilità al nostro servizio con il compito di notificare agli widget caricati nella dashboard, che un determinato widget é stato selezionato attraverso il Dial e contemporaneamente all'emissione dell'evento conservare l'id dello stesso al suo interno.
+
 \vspace{1.0cm}
+\begin{lstlisting}[caption={Notifica selezione Widget e salvataggio id},style=javaScriptCode]
+    public currentWidget: string;
+    public onWidgetSelected = new EventEmitter<string>();
+    public set widget(id : string) {
+        this.currentWidget = id;
+        this.onWidgetSelected.emit(this.currentWidget);
+    }
+\end{lstlisting} 
+\vspace{1.0cm}
+
+In questo modo, ogni qualvolta un widget viene selezionato, il servizio notifica a tutti gli widget presenti nella dashboard che é avvenuta un'acquisizione, delegando agli stessi il compito di verificare se la medesima selezione emessa contiene l'identificatore a loro associato. Qualora il widget riscontrasse che la stringa emessa non corrisponde al suo id, effettua l'\emph{unsubscribe} agli eventi di notifica delle azioni emesse dal Dial se presenti.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Sottoscrizione all'evento di notifica selezione Widget},style=javaScriptCode]
+this.widgetSubscription = this.dialService.onWidgetSelected.subscribe(id => {
+      if (id !== this.widget.id) {
+        this.channelDialSubscriptions?.unsubscribe();
+        this.isActive = false;
+      }
+    });
+\end{lstlisting} 
+\vspace{1.0cm}
+
+\subsection{Supporto MultiDashboard}
+
 \subsection{Feedback aptico}
+Il dispositivo Dial ha come caratteristica quella di emettere feedback haptici di vibrazione variabile, tra questi é possibile variare l'intensità e la durata al fine di restituire all'utente un chiaro segnale di ció che sta succedendo nel contesto dell'applicazione.
+Considerata l'elevata personalizzazione della vibrazione, abbiamo definito tre livelli di vibrazione associabili alle operazioni che vengono comunemente svolte:
+
+\begin{itemize}
+\item \textbf{Normal}: Feedback utilizzato nelle operazioni basilari.
+\item \textbf{Warning}: Feedback utilizzato per le operazioni che richiedono l'attenzione dell'utente
+\item \textbf{Error}: Feedback identificativo di un'operazione non permessa o pericolosa.
+\end{itemize} 
+
+La descrizione di questi livelli viene definita attraverso un' \textbf{Enum} inserito nel Core dell'applicazione UWP, permettendo una maggiore scalabilitá qualora si vogliano aggiungere in futuro ulteriori livelli di feedback personalizzabili.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Selezione feedback corrente},style=javaScriptCode]
+public void setStatusFeedback(string type)
+{
+	switch (type)
+	{
+		case "normal": 
+			statusFeedback = StatusFeedback.Normal;
+			break;
+		case "error":
+			statusFeedback = StatusFeedback.Error;
+			break;
+		case "warning":
+			statusFeedback = StatusFeedback.Warning;
+			break;
+	}
+}
+\end{lstlisting} 
+\vspace{1.0cm}
+
+Il metodo sopra descritto é stato inserito all'interno della classe DialController al fine di poter esser richiamato anche lato Web grazie all'oggetto iniettato, rendendo dinamica la scelta del feedack da utilizzare.
+
+Abbiamo integrato questa funzionalitá in due aspetti ritenuti importanti del programma:
+Il primo ambito in cui é stato necessario inserire un feedback differente e personalizzato é quello dell'acquisizione di un Widget attraverso il posizionamento del Dial sullo schermo, permettendo di notificare all'utente la corretta selezione del Widget.
+Il rilascio del feedabck avviene durante la fase di contatto tra il dial e lo schermo attraverso il metodo privato \textbf{SendHapticFeedback} il quale prende come primo parametro in ingresso l'oggetto SimpleHapticsController che consente l'accesso al dispositivo di input aptico e come secondo parametro il livello selezionato rappresentato dall'Enum descritto in precedenza.\\
+
+La vibrazione avviene qualora una voce di menu venga selezionata durante il posizionamento del Dial sullo schermo, verificata attraverso l'utilizzo di un flag boolano (\emph{onScreen}) che tiene traccia di questa fase.
+
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Rilascio feedback selezione},style=javaScriptCode]
+public async void ItemInvoked(DialMenuItem item)
+{
+	if (onScreen){
+		SendHapticFeedback(simpleHaptics, StatusFeedback.Warning);
+	}
+	string function = 
+	"window.DialFrontendBridge.InvokeEvent('" + item.Tag.ToString() + "')";
+	await webView.InvokeScriptAsync("eval", new string[] { function });
+	currentItemTag = item.Tag;
+} 
+\end{lstlisting} 
+\vspace{1.0cm}
+
 \subsection{Variazione degree personalizzata}
 Uno dei problemi principali per gli utilizzatori della dashboard per il testing di motori era la presenza di un moltiplicatore statico per i potenziometri presenti nella pulsantiera, ciò comporta un notevole svantaggio per il cambiamento di variabili di ordine diverso, come ad esempio il cambiamento del numero di giri di un motore espresso in millesimi e TROVARE ESEMPIO, per questo abbiamo pensato di inserire un moltiplicatore dinamico all'interno del widget che permette di cambiare il valore del singolo tick del Dial, consentendo così di eseguire una modifica più rapida dei dati, personalizzata per lo specifico widget.
 Inizialmente l'idea era di inserire un parametro in fase di configurazione per decidere a priori il valore del moltiplicatore, me rimanendo comunque in parte statico abbiamo optato per una variazione a dashboard avviata.
@@ -314,11 +396,11 @@ Dopo vari test siamo giunti alla conclusione di inserire semplicemente tre botto
 \end{lstlisting} 
 \vspace{1.0cm}
 Una volta aggiunti i bottoni abbiamo creato il relativo metodo da eseguire in caso di pressione del bottone che modifica la variabile.
-\vspace{1.0cm}
+\vspace{0.5cm}
 \begin{lstlisting}[caption={Modifica del moltiplicatore},style=javaScriptCode]
 public ticksetter(newValue : number) {
     this.moltiplicator = newValue;
-  }
+}
 \end{lstlisting} 
 \vspace{1.0cm}
 Una volta modificato il moltiplicatore lo abbiamo inserito all'interno degli eventi del Dial che modificano il valore all'interno del widget
@@ -341,8 +423,6 @@ Fatto questo il risultato finale è un widget contenente 3 bottoni che aumentano
   \includegraphics[width=0.4\textwidth]{Tick}
   \caption{Widget contenente una variazione personalizzata della rotazione}
 \end{figure}
-
-
 
 \section{Utilizzo del Servizio}
 
@@ -402,7 +482,6 @@ const click = this.dialService.dialFrontendBridge.onClickEvent.subscribe(
 
 const pressRot = this.dialService.dialFrontendBridge.onPressedRotationEvent.subscribe(
 ({ tag, degree }) => {
-      // Azione associata all'evento rotazione con pressione del Dial.
       if (tag === this.channels[this.currentChannel].parameter.value) {
         this.setSetterAtIndex(
         this.currentChannel, 
@@ -412,14 +491,11 @@ const pressRot = this.dialService.dialFrontendBridge.onPressedRotationEvent.subs
         this.getNumberSetterComponent(this.currentChannel).value);
       }
     });
-    this.channelDialSubscriptions?.unsubscribe();
-    this.channelDialSubscriptions = new Subscription();
-    this.channelDialSubscriptions.add(rotation).add(click).add(pressRot);
 \end{lstlisting} 
 \vspace{1.0cm}
 
-
-I metodo sopra implementati, permettono di eseguire una determinata azione quando viene richiamato un metodo presente in DialFrontendBridge come la rotazione o la pressione combinata alla rotazione, che permette quindi nel caso dell'acquisizione tramite il contatto del Dial sullo schermo, mantenendo il controllo e il relativo comportamento, anche appoggiandolo sulla scrivania, evitano il pericolo che nel tratto in cui é il dispositivo si trova sospeso, possano avvenire chiamate pericolose.
+I metodo sopra implementati, permettono il richiamo di una determinata funzione implementata dall'utilizzatore del servizio, ogni qualvolta venga richiamato un evento presente in DialFrontendBridge come la rotazione o la pressione combinata alla rotazione.
+Quest'ultima, permette nel caso dell'acquisizione Widget tramite il contatto del Dial sullo schermo di mantenerne il controllo, evitando il pericolo che nel tratto in cui é il dispositivo si trovi sospeso, possano avvenire chiamate pericolose.
 
 \section{Testing}
 
