@@ -301,6 +301,49 @@ inputInfo.DeltaY = 1;
 \vspace{1.0cm}
 \subsection{Feedback aptico}
 \subsection{Variazione degree personalizzata}
+Uno dei problemi principali per gli utilizzatori della dashboard per il testing di motori era la presenza di un moltiplicatore statico per i potenziometri presenti nella pulsantiera, ciò comporta un notevole svantaggio per il cambiamento di variabili di ordine diverso, come ad esempio il cambiamento del numero di giri di un motore espresso in millesimi e TROVARE ESEMPIO, per questo abbiamo pensato di inserire un moltiplicatore dinamico all'interno del widget che permette di cambiare il valore del singolo tick del Dial, consentendo così di eseguire una modifica più rapida dei dati, personalizzata per lo specifico widget.
+Inizialmente l'idea era di inserire un parametro in fase di configurazione per decidere a priori il valore del moltiplicatore, me rimanendo comunque in parte statico abbiamo optato per una variazione a dashboard avviata.
+Dopo vari test siamo giunti alla conclusione di inserire semplicemente tre bottoni che attraverso un binding ad una nuova variabile la modificano e tramite essa avviene il cambiamento di dato una volta ruotato il dispositivo.
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Aggiunta dei bottoni all'interno del file HTML del componente},style=javaScriptCode]
+ <div style="text-align:center">
+ <button (click)="ticksetter(0.1)">x0.1</button>
+ <button (click)="ticksetter(1)">x1</button>
+ <button (click)="ticksetter(10)">x10</button>
+ </div>
+\end{lstlisting} 
+\vspace{1.0cm}
+Una volta aggiunti i bottoni abbiamo creato il relativo metodo da eseguire in caso di pressione del bottone che modifica la variabile.
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Modifica del moltiplicatore},style=javaScriptCode]
+public ticksetter(newValue : number) {
+    this.moltiplicator = newValue;
+  }
+\end{lstlisting} 
+\vspace{1.0cm}
+Una volta modificato il moltiplicatore lo abbiamo inserito all'interno degli eventi del Dial che modificano il valore all'interno del widget
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Utilizzo del moltiplicatore},style=javaScriptCode]
+const rotation = 
+this.dialService.dialFrontendBridge.onRotationEvent.subscribe((
+{ tag, degree }) => {
+      // Azione associata all'evento rotazione del Dial.
+      if (tag === this.channels[this.currentChannel].parameter.value) {
+        this.setSetterAtIndex(this.currentChannel, 
+        parseNumber(degree)* this.moltiplicator);
+      }
+    });
+\end{lstlisting} 
+\vspace{1.0cm}
+Fatto questo il risultato finale è un widget contenente 3 bottoni che aumentano o diminuiscono il valore del singolo tick di rotazione del Dial.
+\begin{figure}[htpb!]
+\center
+  \includegraphics[width=0.4\textwidth]{Tick}
+  \caption{Widget contenente una variazione personalizzata della rotazione}
+\end{figure}
+
+
+
 \section{Utilizzo del Servizio}
 
 Per utilizzare il servizio DialService, occorre importarlo nel costruttore del componente che si sta sviluppando, in questo modo avremo accesso agli eventi che ci consentono di avere notifiche dal Dial.
