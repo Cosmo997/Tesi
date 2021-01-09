@@ -326,6 +326,14 @@ this.widgetSubscription = this.dialService.onWidgetSelected.subscribe(id => {
 \vspace{1.0cm}
 
 \subsection{Supporto MultiDashboard}
+Una funzionalità fondamentale per quanto riguarda l'usabilità dell'applicazione è l'utilizzo di più pagine Web all'interno della stessa istanza di programma UWP, poichè l'utilizzo di diverse istanze potrebbe portare, oltre che problemi di organizzazione, anche conflitti nell'utilizzo del Microsoft Dial. Per ovviare a queste problematiche abbiamo inserito all'interno dell'applicazione UWP una sezione precedente al caricamento della pagina web dove è possibile scegliere in una griglia di N elementi precaricati, la pagina web necessaria attraverso il bottone associato.
+Mentre per quanto riguarda la navigazione tra le differenti pagine caricate nell'applicazione abbiamo inserito un tasto "Home" nella parte superiore dello schermo che riporta al menù principale.
+
+\begin{figure}[htpb!]
+  \centering
+  \includegraphics[width=0.5\textwidth]{MultiDashboard}
+  \caption{Menù iniziale UWP}
+\end{figure}
 
 \subsection{Feedback aptico}
 Il dispositivo Dial ha come caratteristica quella di emettere feedback haptici di vibrazione variabile, tra questi é possibile variare l'intensità e la durata al fine di restituire all'utente un chiaro segnale di ció che sta succedendo nel contesto dell'applicazione.
