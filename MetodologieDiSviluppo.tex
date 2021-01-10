@@ -150,6 +150,14 @@ Un'app UWP è:
 \item Coinvolgente: è possibile usare riquadri animati, notifiche push e attività utente che interagiscono con Sequenza temporale di Windows e la funzionalità di ripristino della ricerca dal punto in cui è stata interrotta di Cortana per coinvolgere gli utenti.
 \item Programmabile in C\#, C++, Visual Basic e Javascript. Per l'interfaccia utente usare WinUI, XAML, HTML o DirectX
 \end{itemize}
+\subsection{Microsoft WebView}
+Una WebView integra all'interno di un' applicazione una visualizzazione che esegue il rendering di contenuto web tramite il motore di rendering di Microsoft Edge nel quale possono comparire anche collegamenti ipertestuali funzionanti.
+Metodi utilizzati:
+\begin{itemize}
+\item \emph{AddWebAllowedObject(String, Object)}: Permette di iniettare oggetti runtime nativi windows come parametri globali del documento all'interno della WebView
+\item \emph{InvokeScriptAsync(String, IEnumerable<String>)}: Permette l'invio di script specifici alla pagina web caricata con argomenti specifici come azione asincrona. 
+\end{itemize}
+
 \subsection{C\#}
 \begin{figure}[htpb!]
 \center

@@ -1,3 +1,4 @@
+
 \chapter{Servizio}
 \label{chap:serv}
 In questo capitolo verranno esposti in dettaglio l'architettura finale dell'applicativo sviluppato che permette la comunicazione tra il Surface Dial e la pagina web, le funzionalitá implementate grazie al suddetto servizio, una breve descrizione per lo sviluppatore che intederá utilizzarlo e i test implementati attraverso MSTest con lo scopo di verificare il corretto funzionamento del software
@@ -231,6 +232,18 @@ All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObje
 \begin{lstlisting}[caption={Injection oggetto C\#},style=javaScriptCode]
 webView.AddWebAllowedObject("dial", dial);
 \end{lstlisting}
+\section{Comunicazione bidirezionale}
+Per acquisire il controllo di una pagina web, abbiamo deciso di utilizzare una WebView avviata a RunTime permettendo all'utente di poter utilizzare il Dial sui dispositivi che supportano l'interazione con lo schermo grazie alle Librerie native e di poterla utilizzare senza l'utilizzo del Dial, attraverso un qualsiasi browser web.
+ 
+Le comunicazioni avvengono in maniera bi-direzionale, questo significa che non é solamente l'applicazione UWP a comunicare con la pagina Web, ma anche viceversa.
+Attraverso la funzionalitá InvokeScriptAsync, messa a disposizione dalla WebView, abbiamo definito delle chiamate asincrone che inviano parametri e notificano l'avvenuta emissione di un evento alla pagina Web.
+La notifica dell'avvenuta emissione di un evento dalla pagina web all'applicazione UWP avviene attraverso l'injection di un oggetto la cui classe possiede il decoratore \emph{\@AllowForWeb} che permette di esporre l'oggetto C\# come parametro globale nel contesto della pagina web caricata nella WebView.
+L'utilizzo di AllowForWeb su di una classe e iniettare un'istanza nella pagina, permette un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.
+\begin{figure}[htpb!]
+  \centering
+  \includegraphics[width=0.6\textwidth]{Comunicazione}
+  \caption{Rappresentazione comunicazione bidirezionale}
+\end{figure}
 
 \section{Posizionamento su schermo}
 
