@@ -34,7 +34,7 @@ Per ogni dipendenza che si vuole usare nell'applicazione si deve registrare un p
 
 \subsubsection{Singleton services}
 
-Per restare in linea con le direttive utilizzare dal gruppo Loccioni nello sviluppo dei loro servizi, abbiamo utilizzato il forRoot() pattern per l’injection del servizio nell’applicazione.\\
+Per restare in linea con le direttive utilizzare dal gruppo Loccioni nello sviluppo dei loro servizi, abbiamo utilizzato il forRoot() pattern \cite{ss} per l’injection del servizio nell’applicazione.\\
 
 Questo pattern permette di specificare un modulo personalizzato per il servizio, il quale contiene un metodo statico chiamato appunto forRoot() che restituisce un ModuleWithProvider parametrizzato al modulo del Servizio.\\
 
@@ -106,7 +106,7 @@ public onScreenContactEndedEvent = new EventEmitter();
 \end{lstlisting} 
 \vspace{1.0cm}
 
-Affinché questi metodi possano essere richiamati tramite script dall'applicazione UWP é stato necessario inserire l'istanza della classe all'interno dell'oggetto window, cosi da renderlo visibile e utilizzabile dall'esterno.\\
+Affinché questi metodi possano essere richiamati tramite script dall'applicazione UWP é stato necessario inserire l'istanza della classe all'interno dell'oggetto window \cite{win}, cosi da renderlo visibile e utilizzabile dall'esterno.\\
 
 \vspace{1.0cm}
 \begin{lstlisting}[caption={Inserimento DialFrontendbridge in window },style=javaScriptCode]
@@ -245,7 +245,7 @@ La classe DialMenuItem è una classe “modello” utilizzata per rappresentare 
 
 Nella Main Page avviene l’inizializzazione dei componenti RadialController e la navigazione alla pagina web desiderata.\\
 
-All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObject che ci permette, di iniettare l’oggetto della classe DialController durante il caricamento, passandogli come parametri una stringa rappresentate il nome dell'oggetto, con il quale potrá essere intercettato lato Web e l'istanza dell'oggetto da iniettare.
+All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObject\cite{awao} che ci permette, di iniettare l’oggetto della classe DialController durante il caricamento, passandogli come parametri una stringa rappresentate il nome dell'oggetto, con il quale potrá essere intercettato lato Web e l'istanza dell'oggetto da iniettare.
 
 \begin{lstlisting}[caption={Injection oggetto C\#},style=javaScriptCode]
 webView.AddWebAllowedObject("dial", dial);
@@ -260,7 +260,7 @@ Attraverso la funzionalitá InvokeScriptAsync, messa a disposizione dalla WebVie
 
 La notifica dell'avvenuta emissione di un evento dalla pagina web all'applicazione UWP avviene attraverso l'injection di un oggetto la cui classe possiede il decoratore \emph{\@AllowForWeb} che permette di esporre l'oggetto C\# come parametro globale nel contesto della pagina web caricata nella WebView.\\
 
-L'utilizzo di AllowForWeb su di una classe e iniettare un'istanza nella pagina, permette un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.
+L'utilizzo di AllowForWeb\cite{afw} su di una classe e iniettare un'istanza nella pagina, permette un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.
 \begin{figure}[htpb!]
   \centering
   \includegraphics[width=0.7\textwidth]{Comunicazione}
@@ -308,7 +308,7 @@ Grazie all’attributo Position di tipo Point, é possibile ottenere, attraverso
 \end{lstlisting} 
 \vspace{1.0cm}
 
-Attraverso la libreria Window.UI.Core é possibile spostare il cursore in un punto definito della UI corrente. Per questo motivo, la classe WebNotifier presenta un attributo private e readonly chiamato window, un oggetto di tipo WindowCore che permette di intercettare eventi relativi ai dispositivi di Input utilizzati e di posizionare il cursore del mouse in una posizione specifica in base alle coordinate passategli. In questo modo, attraverso l’attributo PointerPosition abbiamo creato un nuovo oggetto di tipo Point con le coordinate X e Y acquisite dal Dial consentendoci di posizionare il cursore in quel determinato punto.
+Attraverso la libreria Window.UI.Core\cite{wuc} é possibile spostare il cursore in un punto definito della UI corrente. Per questo motivo, la classe WebNotifier presenta un attributo private e readonly chiamato window, un oggetto di tipo WindowCore che permette di intercettare eventi relativi ai dispositivi di Input utilizzati e di posizionare il cursore del mouse in una posizione specifica in base alle coordinate passategli. In questo modo, attraverso l’attributo PointerPosition abbiamo creato un nuovo oggetto di tipo Point con le coordinate X e Y acquisite dal Dial consentendoci di posizionare il cursore in quel determinato punto.
 \vspace{1.0cm}
 \begin{lstlisting}[caption={Spostamento cursore},style=javaScriptCode]
   window.PointerPosition = new Point(args.Contact.Position.X, args.Contact.Position.Y);
@@ -317,7 +317,7 @@ Attraverso la libreria Window.UI.Core é possibile spostare il cursore in un pun
 Questa soluzione permette di spostare dinamicamente il cursore nella posizione centrale al disotto del Dial quando viene posizionato sopra lo schermo, così da poter intercettare lato Web la posizione esatta del cursore e permettere agli utilizzatori del servizio di riprodurre il comportamento appropriato per il Widget sopra il quale ci si posiziona.\\
 
 Abbiamo quindi previsto nel Template HTML del Widget un metodo \emph{OnMouseOver} che venisse richiamato solamente qualora il Dial fosse effettivamente a contatto con lo schermo, ma il semplice spostamento del cursore nella nuova posizione non richiamava correttamente il metodo in quanto il cursore non effettuava un movimento, ma veniva ricreato in quella determinata posizione.
-Affinché la soluzione ideata funzionasse correttamente abbiamo importato una libreria chiamata Windows.UI.Input.Preview.Injection che mette a disposizione funziolitá per la simulazione di eventi di input.\\
+Affinché la soluzione ideata funzionasse correttamente abbiamo importato una libreria chiamata Windows.UI.Input.Preview.Injection\cite{ipi} che mette a disposizione funziolitá per la simulazione di eventi di input.\\
 
 Una volta posizionato il cursore nella nuova posizione, siamo stati in grado di simulare un impercettibile movimento del cursore di un singolo pixel, grazie al quale ci é stato possibile intercettare correttamente l’evento OnMouseMove dichiarato nel Template del Widget eseguendo il metodo associato.
 
@@ -407,7 +407,7 @@ Il metodo sopra descritto é stato inserito all'interno della classe DialControl
 
 Abbiamo integrato questa funzionalitá in due aspetti ritenuti importanti del programma:
 Il primo ambito in cui é stato necessario inserire un feedback differente e personalizzato é quello dell'acquisizione di un Widget attraverso il posizionamento del Dial sullo schermo, permettendo di notificare all'utente la corretta selezione del Widget.
-Il rilascio del feedabck avviene durante la fase di contatto tra il dial e lo schermo attraverso il metodo privato \textbf{SendHapticFeedback} il quale prende come primo parametro in ingresso l'oggetto SimpleHapticsController che consente l'accesso al dispositivo di input aptico e come secondo parametro il livello selezionato rappresentato dall'Enum descritto in precedenza.\\
+Il rilascio del feedabck avviene durante la fase di contatto tra il dial e lo schermo attraverso il metodo privato \textbf{SendHapticFeedback} il quale prende come primo parametro in ingresso l'oggetto SimpleHapticsController\cite{wdh} che consente l'accesso al dispositivo di input aptico e come secondo parametro il livello selezionato rappresentato dall'Enum descritto in precedenza.\\
 
 La vibrazione avviene qualora una voce di menu venga selezionata durante il posizionamento del Dial sullo schermo, verificata attraverso l'utilizzo di un flag boolano (\emph{onScreen}) che tiene traccia di questa fase.
 
@@ -419,7 +419,7 @@ public async void ItemInvoked(DialMenuItem item)
 		SendHapticFeedback(simpleHaptics, StatusFeedback.Warning);
 	}
 	string function = 
-	"window.DialFrontendBridge.InvokeEvent('" + item.Tag.ToString() + "')";
+		"window.DialFrontendBridge.InvokeEvent('" + item.Tag.ToString() + "')";
 	await webView.InvokeScriptAsync("eval", new string[] { function });
 	currentItemTag = item.Tag;
 } 
