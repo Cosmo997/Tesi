@@ -52,6 +52,6 @@ Teams https://www.microsoft.com/it-it/microsoft-365/microsoft-teams/group-chat-s
 
 Trello https://trello.com/
 
+Stadia https://stadia.google.com/?original_url=https%3A%2F%2Fstadia.google.com%2Fhome%3Flink_id%3D2661221736360644940%26utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_campaign%3Dstadia10179%26utm_term%3DBKWSExact%26utm_content%3DCore%26gclid%3DCjwKCAiAi_D_BRApEiwASslbJwSfRawg1UwUr4zKVejG2e_zdr1vzxWdQdzNt7awvj0weS3Cvtd51BoCBeEQAvD_BwE%26gclsrc%3Daw.ds&redirect_reasons=2&link_id=2661221736360644940&utm_source=google&utm_medium=cpc&utm_campaign=stadia10179&utm_term=BKWSExact&utm_content=Core&gclid=CjwKCAiAi_D_BRApEiwASslbJwSfRawg1UwUr4zKVejG2e_zdr1vzxWdQdzNt7awvj0weS3Cvtd51BoCBeEQAvD_BwE&gclsrc=aw.ds
 
-
-
+Midi Dial  https://hackaday.com/2018/09/04/make-the-surface-dial-do-more-things-such-as-midi/
