@@ -89,7 +89,7 @@
 \RequirePackage[italian]{varioref}
 \RequirePackage[italian]{babel}
 \RequirePackage[babel]{csquotes}
-\RequirePackage[style=alphabetic, backend=bibtex]{biblatex}
+\RequirePackage[style=alphabetic, backend=biber]{biblatex}
 \RequirePackage{colortbl}
 
 \RequirePackage[final]{listings}
@@ -206,9 +206,9 @@
   {\rmfamily \Large \scshape Scuola di \@theschool \par}%
   \vspace{0.15cm}%
   {\rmfamily \large Corso di \@thecourse \par}%
-  \vspace*{\stretch{7}}%
-  \includegraphics[width=25mm]{Immagini/stemma}\par%
-  \vspace{0.15cm}%
+  \vspace*{\stretch{6}}%
+  \includegraphics[width=30mm]{Immagini/stemma}\par%
+  \vspace{1.0cm}%
   {\rmfamily \LARGE \bfseries \@thetitle \par}%
   \vspace*{\stretch{7}}%
   {Laureandi \hfill Relatore \par}%
