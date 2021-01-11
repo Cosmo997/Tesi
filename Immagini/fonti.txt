@@ -10,8 +10,7 @@ https://github.com/Microsoft/Windows-universal-samples/tree/master/Samples/Radia
 Sonnino
 https://blogs.msmvps.com/bsonnino/2016/12/
 
-Progress Software Corporation. Modern UI made easy. url: https://www.
-telerik.com/.
+Kendo UI url: https://www.telerik.com/
 
 GitLab. 2020. url: https://it.wikipedia.org/wiki/GitLab.
 
@@ -19,17 +18,47 @@ HTML. 2020. url: https://en.wikipedia.org/wiki/HTML.
 
 Loccioni. Loccioni. url: https://www.loccioni.com/it/misura/.
 
-[Micf] Microsoft. Visual Studio. url: https://visualstudio.microsoft.com/it/vs/
+Microsoft. Visual Studio. url: https://visualstudio.microsoft.com/it/vs/
 community/.
 
-[Micg] Microsoft. Visual Studio Code. url: https://code.visualstudio.com/docs.
+Microsoft. Visual Studio Code. url: https://code.visualstudio.com/docs.
 
-[Npm] Npm (Software). url: https://it.wikipedia.org/wiki/Npm (software).
+Npm (Software). url: https://it.wikipedia.org/wiki/Npm (software).
 
-[teaa] Angular team. Introduction to Angular concepts. url: https://angular.io/.
+Angular team. Introduction to Angular concepts. url: https://angular.io/.
 
-[Typ] TypeScript. url: https://github.com/Microsoft/TypeScript.
+TypeScript. url: https://github.com/Microsoft/TypeScript.
 80
+
+Scrum url:https://it.wikipedia.org/wiki/Scrum_(informatica)#:~:text=Scrum%20%C3%A8%20un%20framework%20agile,Ken%20Schwaber%20e%20Jeff%20Sutherland.
+
+Rilascio incrementale url: https://it.wikipedia.org/wiki/Modello_incrementale
+
+Microsoft Dial url: https://support.microsoft.com/it-it/surface/scoprire-surface-dial-1e58a0e6-4d4a-6303-afcd-ef0234047628
+
+UWP https://docs.microsoft.com/it-it/windows/uwp/
+
+webview https://docs.microsoft.com/it-it/windows/uwp/design/controls-and-patterns/web-view
+
+C# https://it.wikipedia.org/wiki/C_sharp
+
+Libreria Radialcontroller https://docs.microsoft.com/en-us/uwp/api/windows.ui.input.radialcontroller?view=winrt-19041
+
+Git https://git-scm.com/
+
+Visual Studio https://visualstudio.microsoft.com/it/
+
+Remote debugger https://docs.microsoft.com/it-it/visualstudio/debugger/remote-debugging?view=vs-2019
+
+VScode https://code.visualstudio.com/
+
+GitLab https://about.gitlab.com/
+
+Miro https://miro.com/
+
+Teams https://www.microsoft.com/it-it/microsoft-365/microsoft-teams/group-chat-software
+
+Trello https://trello.com/
 
 
 
