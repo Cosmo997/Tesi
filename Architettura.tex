@@ -11,7 +11,7 @@ Il progetto sviluppato si presenta suddiviso in due parti ben distinte:
 
 \subsection{Servizio Angular}
 
-In Angular, i Servizi rappresentano un tassello fondamentale per la realizzazione di un'applicazione. Un servizio è solitamente rappresentato da una classe indipendente dalla View che viene definita per svolgere un compito ben preciso ed effettuare delle operazioni strettamente correlate tenendo in mente il principio di singola responsabilità.\\
+In Angular\cite{ang}, i Servizi rappresentano un tassello fondamentale per la realizzazione di un'applicazione. Un servizio è solitamente rappresentato da una classe indipendente dalla View che viene definita per svolgere un compito ben preciso ed effettuare delle operazioni strettamente correlate tenendo in mente il principio di singola responsabilità.\\
 È possibile definire più servizi all'interno di un'applicazione, ognuno dei quali si occupa di portare a termine un determinato incarico incrementando la modularitá del progetto, inoltre un servizio puó a sua volta dipendere da altri servizi, che vengono definiti nel costruttore del servizio stesso.\\
 
 Avvalendosi di Angular CLI, possiamo creare un Servizio tramite il comando:
@@ -180,7 +180,7 @@ Durante la sua inizializzazione, il widget si sottoscrive all'evento di Invoke, 
  
 \subsection{Applicazione UWP}
 
-Il secondo componente del progetto è costituito da un'applicazione UWP (Universal Windows Platform), presa in considerazione poiché la più recente tra i framework Microsoft e tra le sue caratteristiche troviamo la sicurezza e la portabilità tra le diverse piattaforme Windows, ciò consente un maggiore supporto nel tempo e intercambiabilità tra i dispositivi dove utilizzarla. L'eseguibile sviluppato prende il nome di \textbf{DialBridge}.\\
+Il secondo componente del progetto è costituito da un'applicazione UWP (Universal Windows Platform)\cite{uwpdoc}, presa in considerazione poiché la più recente tra i framework Microsoft e tra le sue caratteristiche troviamo la sicurezza e la portabilità tra le diverse piattaforme Windows, ciò consente un maggiore supporto nel tempo e intercambiabilità tra i dispositivi dove utilizzarla. L'eseguibile sviluppato prende il nome di \textbf{DialBridge}.\\
 
 \subsubsection{DialBridge}
 
@@ -209,15 +209,33 @@ Nel Core è contenuta la parte del progetto UWP che non richiede l'avvio a runti
 
 La classe DialController è una tra le più importanti poiché una sua istanza verrà poi inserita all’interno della WebView e servirà al servizio DialService per la comunicazione Web-UWP. I metodi pubblici al suo interno sono gli stessi dell’interfaccia DialBackendBridge che vengono utilizzati appunto tramite l’oggetto iniettato inizialmente.\\
 
-Al suo interno troviamo un’ istanza della classe RadialController, ovvero la libreria Microsoft che permette la manipolazione del Dial, un'istanza di RadialControllerConfiguration e infine un notifier.\\
+Al suo interno troviamo un’ istanza della classe RadialController\cite{rad}, ovvero la libreria Microsoft che permette la manipolazione del Dial, un'istanza di RadialControllerConfiguration e infine un notifier.\\
 
 Nel costruttore abbiamo assegnato agli eventi presenti nella classe RadialController il relativo handler nella classe WebNotifier, in questo modo ogni volta che verrà emesso un determinato evento la pagina web riceverà una notifica e verrà svolta la funzione associata a quella determinata voce di menù.
 
 \subsubsection{WebNotifier}
 
-La classe WebNotifier contiene al suo interno una istanza della WebView ed ha come responsabilità quella di fornire i metodi che verranno poi utilizzati come EventHandler per gli eventi forniti dalla classe RadialController, in modo tale da riuscire a comunicare, attraverso la WebView al suo interno, alla pagina web l’emissione dell’evento stesso.\\
+La classe WebNotifier contiene al suo interno i metodi "Handler" per le azioni svolte dal Dial, un esempio lo possiamo trovare con il metodo RotationChangedAsync che viene eseguito ogni volta che il dispositivo viene ruotato.
+ 
+Le azioni che vengono gestite sono:
+\begin{itemize}
+\item Selezione di un elemento del Menù
+\item Pressione del bottone
+\item Rotazione del Dial
+\item Contatto con lo schermo avviato
+\item Contatto con lo schermo continuo
+\item Contatto con lo schermo terminato
+\end{itemize}
+La notifica alla pagina web delle azioni svolte avviene attraverso un'istanza della webView ottenuta in precedenza nel suo costruttore, dalla quale vengono richiamati i metodi InvokeScriptAsync che eseguono lo script presente nella pagina web.
 
-Al suo interno è presente anche un oggetto della classe CoreWindow utilizzato per spostare la posizione del mouse sullo schermo al primo contatto del Dial sulla superficie.
+\vspace{1.0cm}
+\begin{lstlisting}[caption={Esempio Handler Eventi Dial},style=javaScriptCode]
+internal async Task ButtonClickedAsync(){
+	string function = 
+		"window.DialFrontendBridge.ClickEvent('" + currentItemTag + "')";
+    await webView.InvokeScriptAsync("eval", new string[] { function});
+}
+\end{lstlisting} 
 
 \subsubsection{DialMenuItem}
 
@@ -232,19 +250,24 @@ All’interno del metodo NavigationStarting troviamo il metodo AddWebAllowedObje
 \begin{lstlisting}[caption={Injection oggetto C\#},style=javaScriptCode]
 webView.AddWebAllowedObject("dial", dial);
 \end{lstlisting}
+
+\newpage
 \section{Comunicazione bidirezionale}
-Per acquisire il controllo di una pagina web, abbiamo deciso di utilizzare una WebView avviata a RunTime permettendo all'utente di poter utilizzare il Dial sui dispositivi che supportano l'interazione con lo schermo grazie alle Librerie native e di poterla utilizzare senza l'utilizzo del Dial, attraverso un qualsiasi browser web.
+Per acquisire il controllo di una pagina web, abbiamo deciso di utilizzare una WebView avviata a RunTime permettendo all'utente di poter utilizzare il Dial sui dispositivi che supportano l'interazione con lo schermo grazie alle Librerie native e di poterla utilizzare senza l'utilizzo del Dial, attraverso un qualsiasi browser web.\\
  
 Le comunicazioni avvengono in maniera bi-direzionale, questo significa che non é solamente l'applicazione UWP a comunicare con la pagina Web, ma anche viceversa.
-Attraverso la funzionalitá InvokeScriptAsync, messa a disposizione dalla WebView, abbiamo definito delle chiamate asincrone che inviano parametri e notificano l'avvenuta emissione di un evento alla pagina Web.
-La notifica dell'avvenuta emissione di un evento dalla pagina web all'applicazione UWP avviene attraverso l'injection di un oggetto la cui classe possiede il decoratore \emph{\@AllowForWeb} che permette di esporre l'oggetto C\# come parametro globale nel contesto della pagina web caricata nella WebView.
+Attraverso la funzionalitá InvokeScriptAsync, messa a disposizione dalla WebView, abbiamo definito delle chiamate asincrone che inviano parametri e notificano l'avvenuta emissione di un evento alla pagina Web.\\
+
+La notifica dell'avvenuta emissione di un evento dalla pagina web all'applicazione UWP avviene attraverso l'injection di un oggetto la cui classe possiede il decoratore \emph{\@AllowForWeb} che permette di esporre l'oggetto C\# come parametro globale nel contesto della pagina web caricata nella WebView.\\
+
 L'utilizzo di AllowForWeb su di una classe e iniettare un'istanza nella pagina, permette un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.
 \begin{figure}[htpb!]
   \centering
-  \includegraphics[width=0.6\textwidth]{Comunicazione}
+  \includegraphics[width=0.7\textwidth]{Comunicazione}
   \caption{Rappresentazione comunicazione bidirezionale}
 \end{figure}
 
+\newpage
 \section{Posizionamento su schermo}
 
 Uno dei maggiori vantaggi dell’utilizzo di un surface Dial è la possibilità di posizionarlo sopra uno schermo compatibile e di variare il suo funzionamento in base alla posizione utilizzata.
