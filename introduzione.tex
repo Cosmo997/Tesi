@@ -2,14 +2,14 @@
 \label{chap:intro}
 
 Negli ultimi anni, lo sviluppo e controllo di software aziendali si sta spostando in maniera decisa verso il Web, permettendo una maggior portabilità e scalabilità in termini di sviluppo e riutilizzo, consentendo il controllo da remoto tramite qualsiasi dispositivo connesso alla rete. Di conseguenza l’utilizzo di dispositivi di input che si basano sul protocollo HID é sempre piú richiesto e talvolta necessario anche in ambienti Web, per una miglior esperienza utente e una maggior precisione nelle operazioni.
-Durante il nostro periodo di Stage++ svolto presso l'impresa \emph{Loccioni} \cite{Loc}, ci é stato proposto di analizzare le possibili strade da percorre al fine di integrare un dispositivo Microsoft, in particolare il \emph{Surface Dial}, all'interno delle loro Dashbord, utilizzate per la visualizzazione e la manipolazione dei dati durante le fasi di testing su componenti elettronici.
+Durante il nostro periodo di Stage++ svolto presso l'impresa \emph{Loccioni} \cite{Loc}, ci é stato proposto di analizzare le possibili strade da percorre al fine di integrare un dispositivo Microsoft, in particolare il \emph{Surface Dial}\cite{dial}, all'interno delle loro Dashbord, utilizzate per la visualizzazione e la manipolazione dei dati durante le fasi di testing su componenti elettronici.
 \begin{center}
 \includegraphics[width=0.5\textwidth]{loccioni}
 \end{center}
 
 \newpage
 \section{Obiettivo}
-Attualmente nei banchi prova dove vengono effettuati i test su componenti elettrici di Automobili, lo strumento principale per la variazione dei dati é rappresentato da una pulsantiera visibile nella foto RIF, composta da potenziometri analogici, bottoni e switch, i quali rappresentano delle evidenti limitazioni in termini  di usabilità e sicurezza.Per questo motivo, attraverso una digitalizzazione della pulsantiera e l'utilizzo di un dispositivo di precisione, l'utilizzo finale di un banco prova risulterebbe piú sicuro e semplice da utilizzare per l'operatore, migliorandone l'efficienza e la precisione con conseguente risparmio in termini di tempo e denaro.\\
+Attualmente nei banchi prova dove vengono effettuati i test su componenti elettrici di Automobili, lo strumento principale per la variazione dei dati é rappresentato da una pulsantiera, composta da potenziometri analogici, bottoni e switch, i quali rappresentano delle evidenti limitazioni in termini  di usabilità e sicurezza.Per questo motivo, attraverso una digitalizzazione della pulsantiera e l'utilizzo di un dispositivo di precisione, l'utilizzo finale di un banco prova risulterebbe piú sicuro e semplice da utilizzare per l'operatore, migliorandone l'efficienza e la precisione con conseguente risparmio in termini di tempo e denaro.\\
 
 L'elaborato in questione ha quindi come obbiettivo l'integrazione del dispositivo Microsoft \textbf{Surface Dial} nei software Web Loccioni, in particolare nelle Dashboard utilizzate nei banchi prova per la visualizzazione e la manipolazione dei dati, con lo scopo di rendere piú fluida e intuitiva l'esperienza utente e consentendo all'operatore finale di svolgere operazioni in parallelo, attraverso l'utilizzo di entrambe le mani, mantenendo il focus di un dispositivo su un determinato compito.\\
 
@@ -20,7 +20,7 @@ A tal proposito, per rendere possibile tale integrazione é stato necessario svo
 
 L'idea iniziale era quella di utilizzare il Dial per il controllo di macchinari, che attualmente fanno uso di programmi Windows Forms per la manipolazione dei dati, mentre si appoggiano ad un loro Framework Web per la visualizzazione in tempo reale dei dati stessi.\\
 
-Per prima cosa ci siamo dedicati alla lettura della documentazione scritta da Microsoft e siamo giunti alla conclusione che le funzionalità base del Dial sono quattro eventi principali:
+Per prima cosa ci siamo dedicati alla lettura della documentazione scritta da Microsoft \cite{dialdoc} e siamo giunti alla conclusione che le funzionalità base del Dial sono quattro eventi principali:
 
 \begin{itemize}
 \item \textbf{Click}: Pressione rapida del bottone presente nel dispositivo.
@@ -29,14 +29,14 @@ Per prima cosa ci siamo dedicati alla lettura della documentazione scritta da Mi
 \item \textbf{Posizionamento sullo schermo}: Il dispositivo può essere appoggiato in alcuni schermi compatibili ed essere riconosciuto dal sistema.
 \end{itemize}
 
-Una volta individuate le potenzialità del Dial, abbiamo iniziato una fasi di testing su applicazioni native per comprendere come e dove potevamo utilizzare le librerie messe a disposizione per il dispositivo, con la successiva creazione di un piccolo prototipo che sfruttasse e mostrasse le suddette funzionalità.\\
+Una volta individuate le potenzialità del Dial, abbiamo iniziato una fasi di testing su applicazioni native\cite{uwpex} per comprendere come e dove potevamo utilizzare le librerie messe a disposizione per il dispositivo, con la successiva creazione di un piccolo prototipo che sfruttasse e mostrasse le suddette funzionalità.\\
 
 Successivamente ci siamo dedicati alla comunicazione tra un qualsiasi tipo di ambiente software e il Dial, scoprendo che il dispositivo comunica attraverso il protocollo HID con qualsiasi Hardware, ma senza l'utilizzo della Libreria RadialController, si vanno a perdere tutte quelle funzionalità che permettono l'utilizzo completo del Dial, rendendolo meno necessario in termini di miglioramento della User Experience.
  
 \subsection{Ricerca}
 
 
-Durante lo studio di fattibilità, ci siamo dedicati alla ricerca di progetti che utilizzassero il Dial \cite{son} indifferentemente dall’ambiente, da quello grafico a quello audio, trovando solamente un programma che permettesse l'utilizzo del Dial in un Sintetizzatore Software, attraverso il protocollo MIDI, limitando il controllo alla semplice rotazione e pressione, togliendo tutte quelle funzionalità più interessanti, come il posizionamento del dispositivo sullo schermo e la visualizzazione dinamica del Menu in relazione alla posizione in cui trova.\\
+Durante lo studio di fattibilità, ci siamo dedicati alla ricerca di progetti che utilizzassero il Dial \cite{son} indifferentemente dall’ambiente, da quello grafico a quello audio, trovando solamente un programma che permettesse l'utilizzo del Dial in un Sintetizzatore Software\cite{el}, attraverso il protocollo MIDI, limitando il controllo alla semplice rotazione e pressione, togliendo tutte quelle funzionalità più interessanti, come il posizionamento del dispositivo sullo schermo e la visualizzazione dinamica del Menu in relazione alla posizione in cui trova.\\
 
 Per questo motivo, abbiamo deciso in concordato con i nostri tutor Aziendali di non gestire noi la comunicazione tra dispositivo e software, ma di lasciare questo compito alle librerie messe a disposizione da Microsoft.
 
@@ -48,9 +48,9 @@ Considerando che il posizionamento su schermo è supportato solamente da determi
 \section{Struttura della Tesi}
 L'esposizione del seguente documento sará cosi suddivisa:
 \begin{itemize}
-\item Il capitolo \emph{Metodologie e strumenti di sviluppo} espone la metodologia utilizzata per lo sviluppo del lavoro in team e descrive le tecnologie utilizzate nel corso del progetto.
-\item Il capitolo \emph{Architettura} descrive la struttura del progetto e in dettaglio le funzionalità implementate grazie ad esso.
-\item Il capitolo \emph{Conclusione} racchiude le considerazioni critiche sul lavoro svolto ed espone delle possibili implementazioni future atte a migliorare il servizio.
+\item Il capitolo \emph{Metodologie e strumenti di sviluppo}\autoref{chap:metod} espone la metodologia utilizzata per lo sviluppo del lavoro in team e descrive le tecnologie utilizzate nel corso del progetto.
+\item Il capitolo \emph{Architettura}\autoref{chap:serv} descrive la struttura del progetto e in dettaglio le funzionalità implementate grazie ad esso.
+\item Il capitolo \emph{Conclusione}\autoref{chap: Conclusioni} racchiude le considerazioni critiche sul lavoro svolto ed espone delle possibili implementazioni future atte a migliorare il servizio.
 \end{itemize}
 
 
