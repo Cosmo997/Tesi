@@ -19,7 +19,7 @@ Nel nostro caso, l’utilizzo finale del Dial nei banchi prova del gruppo Loccio
 
 \begin{figure}[htpb!]
 \center
-\includegraphics[width=0.2\textwidth]{Postazione}
+\includegraphics[width=0.5\textwidth]{Postazione}
 \caption{Postazione banchi attuale}
 \end{figure}
 
@@ -30,12 +30,10 @@ Terminata la fase di analisi, in concordato con i nostri tutor aziendali, abbiam
 
 A sostegno di ciò, durante la fase di sviluppo, una difficoltà riscontrata è stata l'assenza di una console di debug web all'interno della WebView impedendoci di verificare il corretto funzionamento della comunicazione bidirezionale, ma grazie al continuo rilascio e aggiornamento da parte della community Micosoft di componenti UWP abbiamo a disposizione una nuova versione della webView rilasciata in versione beta a fine Novembre che consente, oltre a varie migliorie, anche l'utilizzo di una console di debug per lo sviluppo.\\
 
-Un ulteriore difficoltà riscontrata durante la fase di sviluppo nasce dal fatto che la documentazione presente non trattava in maniera specifica l'utilizzo del dispositivo Dial nel nostro contesto.
-Le librerie fornite prevedono la sola integrazione con applicazioni native rendendoci, fino a prova contraria, i primi ad integrarlo in un contesto web, mantenendo però tutte le funzionalità native utilizzabili.
+Un' ulteriore difficoltà riscontrata durante la fase di sviluppo nasce dal fatto che la documentazione presente non trattava in maniera specifica l'utilizzo del dispositivo Dial nel nostro contesto.
+Le librerie fornite prevedono la sola integrazione con applicazioni native rendendoci, fino a prova contraria, i primi ad integrarlo in un contesto web, mantenendo però tutte le funzionalità native utilizzabili.\\
 
-Il problema principale riscontrato dall'utilizzo di un'applicazione UWP con una pagina web caricata al suo interno era quello di riuscire ad implementare una comunicazione bidirezione efficiente tra due lignuaggi di programmazione differenti.
-
-Affinché l'applicazione potesse comunicare con la pagina Web, grazie alla funzionalità InvokeScriptAsync, messa a disposizione dalla WebView, abbiamo definito delle chiamate asincrone che potessero inviare parametri o notificare l'avvenuta emissione di un evento alla pagina Web stessa. Il problema era come poter comunicare dalla pagina Web all'applicazione UWP che fosse avvenuto qualcosa.\\
+Un problema riscontrato nell'utilizzo di un'applicazione UWP con una pagina web caricata al suo interno era quello di riuscire ad implementare una comunicazione bidirezionale efficiente tra due linguaggi di programmazione differenti.
 
 Per risolvere questa problematica ci siamo trovati davanti a due possibilitá:
 
@@ -44,41 +42,30 @@ Per risolvere questa problematica ci siamo trovati davanti a due possibilitá:
 \item Utilizzare il decoratore AllowForWeb su una classe, affinché un'istanza di essa, possa essere iniettata nella pagina Web.
 \end{enumerate}
 
-Dopo aver letto la documentazione e effettuato vari test, la scelta è ricaduta sul decoratore AllowForWeb, in quanto lo ScriptNotify permetteva di mettersi in ascolto di solamente un determinato evento e permetteva il ritorno di una sola stringa come parametro, oltre al fatto che leggendo su varie Community come StackOverflow, venisse sconsigliata questa pratica poiché non sicura in quanto andava necessariamente abilitato lato UWP l'URI di ogni singola pagina da controllare e limitante in termini di prestazioni.\\ 
+Dopo aver letto la documentazione e effettuato vari test, la scelta è ricaduta sul decoratore AllowForWeb, in quanto lo ScriptNotify permetteva di mettersi in ascolto di solamente un determinato evento e permetteva il ritorno di una sola stringa come parametro.
+Inoltre, leggendo su varie Community come StackOverflow, questa pratica viene sconsigliata poiché non sicura, in quanto va necessariamente abilitato lato UWP l'URI di ogni singola pagina da controllare e limitandone l'utilizzo in termini di prestazioni.\\ 
 
-In contrapposizione, utilizzare AllowForWeb su di una classe e iniettare un'istanza nella pagina, ci permetteva un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendo di passare maggiori informazioni e parametri tipati e non solamente stringhe.\\ 
-
-A quel punto l’unico problema rimasto era l’utilizzo di questo oggetto all’interno del Framework Aulos Loccioni, che abbiamo però risolto attraverso lo sviluppo di un servizio Angular che aggiunge livelli di sicurezza e definisce delle API di utilizzo per gli sviluppatori futuri che vorranno integrare l'utilizzo del Dial nelle proprie pagine Web.
-
+In contrapposizione, utilizzare AllowForWeb su di una classe e iniettare un'istanza nella pagina, ci ha permesse un maggior controllo della comunicazione tra Web e UWP grazie all'utilizzo dei metodi messi a disposizione dall'oggetto, permettendoci di scambiare maggiori informazioni e parametri tipati e non solamente stringhe.\\
 
 \section{Sviluppi Futuri}
 
-I possibili sviluppi sono molteplici e un’idea iniziale è quella di inserire un nuovo widget all’interno della dashboard Loccioni in grado di raffigurare attraverso un’immagine una parte del motore o elemento da controllare, in modo tale da avere un’interfaccia più intuitiva per la selezione, e poi, una volta selezionato il widget stesso, avere la possibilità di visualizzare i dettagli del componente attraverso il menù del Dial.\\
-Una seconda modifica da apportare agli widget esistenti è sicuramente quella del controllo del moltiplicatore da applicare ad ogni rotazione avvenuta con il Dial, portando così maggiore precisione nei lavori più complessi e anche rapidità di utilizzo nelle parti che necessitano più rotazioni di Dial.\\
+I possibili sviluppi sono molteplici e un’idea iniziale è quella di inserire un nuovo widget all’interno della dashboard Loccioni in grado di raffigurare attraverso un’immagine, una parte del motore o un componente da controllare, in modo tale da avere un’interfaccia più intuitiva per la selezione, e successivamente, una volta acquisito il widget stesso, avere la possibilità di visualizzare i dettagli e le funzionalità del componente attraverso il menù del Dial.\\
+
 Uno sviluppo futuro sicuramente necessario è l’aggiunta di un controllo sui dati in input lato web, che momentaneamente non è presente nei nostri widget, ma è fatta solamente lato backend.\\
-Per aumentare l’utilizzabilità dell’interfaccia utente è sicuramente necessaria una modifica degli widget da noi creati, per renderli più facilmente selezionabili dal Dial e per migliorare anche l’aspetto visivo.
-In caso poi il progetto arrivi al punto di essere utilizzato, per migliorare la manipolazione di dati in uso nelle dashboard attuali è necessario sicuramente apportare alcune modifiche alla dashboard per consentire un utilizzo attraverso il touchscreen di un qualsiasi dispositivo, in modo tale da rendere veramente fluido l’utilizzo di tutto l’ambiente e poter così eliminare il mouse dalle operazioni svolte più frequentemente.\\
-Per concludere, un possibile miglioramento da apportare al codice è quello di una selezione più veloce ed accurata del widget attraverso il posizionamento sullo schermo, magari attraverso un movimento anticipato del mouse o un movimento continuo.
+
+Per aumentare l'utilizzabilità dell’interfaccia utente è sicuramente necessaria una modifica degli widget da noi creati, per renderli più facilmente selezionabili dal Dial e per migliorare anche l’aspetto visivo.
+
+Il servizio implementato presenta una violazione del principio di singola responsabilità in quanto oltre a gestire la comunicazione bidirezionale con l'applicazione UWP, si occupa anche di tenere traccia di quale Widget presente nella Dashboard é stato acquisito dal Dial in fase di RunMode, escludendo l'ascolto dell'invoke sui suoi canali.
+Pertanto, abbiamo pianificato di spostare questa seconda responsabilitá, creando un nuovo servizio dedicato a questo compito.
+
+Qualora il progetto arrivi al punto di essere utilizzato e rilasciato in ambienti industriali, per migliorare la manipolazione di dati modificabili nelle dashboard attuali sará necessario apportare alcune modifiche alla dashboard, per consentire un utilizzo attraverso il touchscreen di un qualsiasi dispositivo, in modo tale da rendere veramente fluido l’utilizzo di tutto l’ambiente e poter così eliminare il mouse dalle operazioni svolte più frequentemente o che richiedono una maggior precisione nella variazione dei dati.\\
 
 
 
+\section{Evoluzioni}
 
+Nel mese passato, la Google ha rilasciato in fase di Preview una libreria Web chiamata Trial for WebHID, la quale permetterá di far comunicare direttamente con la pagina Web i dispositivi che utilizzano il protocollo HID, come il Dial, permettendo agli sviluppatori futuri di non dover necessariamente passare attraverso una WebView o una applicazione nativa per quel dispositivo.\\
 
-\section{Evoluzioni dello State of Art}
+Lo sviluppo delle API Web portato avanti da Google evidenzia una attuale carenza di strumenti per l'integrazione di dispositivi HID nelle pagine Web, da colmare non solo in ambienti industriali ma anche in quello quotidiano. Un chiaro esempio é la limitata lista di device compatibili con la piattaforma di Cloud Gaming proprietaria Google chiamata Google Stadia, dove al momento é possibile utilizzare solamente determinati controller HID.\\
 
-
-Al momento dello sviluppo, la necessitá di dover passare per un applicazione UWP rappresenta sicuramente una limitazione che andrá tolta qualora il progetto verrá rilasciato in ambito industriale.\\
-
-A favore di questa considerazione, nel mese passato, la Google stessa ha rilasciato in fase di Preview una libreria Web chiamata Trial for WebHID, la quale permetterá di far comunicare direttamente con la pagina Web i dispositivi che utilizzano il protocollo HID, come il Dial, permettendo agli sviluppatori futuri di non dover necessariamente passare attraverso una WebView o una applicazione nativa per quel dispositivo.\\
-
--HID nel web utilizzo
--API google per HID web
--Cloud game -> utilizzo potenza di calcolo esterna all'hardware
--Microsoft spinge sul web con webview2
--portabilità
-
-
-
-
-
-
+Cosi come Google Stadia, anche altre piattaforme Cloud Based Graphic presentano la necessitá di poter integrare dispositivi HID come una tavoletta grafica o una penna Bluetooth nei loro sistemi, al fine di aumentare le funzionalitá offerte e una conseguente User Experince migliorata.\\

@@ -213,10 +213,13 @@
   \vspace*{\stretch{7}}%
   {Laureandi \hfill Relatore \par}%
   {\bfseries \large \@theauthor \hfill \@theadvisor \par}%
+  {\small Matricola \@thematricola \hfill \ \par}%
+  \vspace{0.25cm}%
+  {\bfseries \large Michele Benedetti \hfill \ \par}%
+  {\small Matricola 100888 \hfill \ \par}%
 \end{center}
-{\bfseries \small Matricola \@thematricola}%
 \begin{center}
-  {\hfill Correlatore \par}%
+  {\hfill Tutor Aziendale \par}%
   {\bfseries  \hfill \large  \@thecoadvisor2 \par}%
   \vspace*{\stretch{7}}%
   \hrule%
