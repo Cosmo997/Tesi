@@ -42,17 +42,9 @@ webview https://docs.microsoft.com/it-it/windows/uwp/design/controls-and-pattern
 
 C# https://it.wikipedia.org/wiki/C_sharp
 
-Libreria Radialcontroller https://docs.microsoft.com/en-us/uwp/api/windows.ui.input.radialcontroller?view=winrt-19041
-
 Git https://git-scm.com/
 
-Visual Studio https://visualstudio.microsoft.com/it/
-
 Remote debugger https://docs.microsoft.com/it-it/visualstudio/debugger/remote-debugging?view=vs-2019
-
-VScode https://code.visualstudio.com/
-
-GitLab https://about.gitlab.com/
 
 Miro https://miro.com/
 
