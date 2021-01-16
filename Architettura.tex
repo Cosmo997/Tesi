@@ -337,7 +337,7 @@ In questa sezione vengono dettagliate le funzionalità aggiuntive implementate a
 
 Inizialmente abbiamo riscontrato che la dashboard non tiene traccia di quale Widget é attualmente utilizzato, in quanto il componente Widget possiede solamente l'attributo \textbf{runMode} che viene impostato a \emph{false} una volta caricato nella Dashboard relativamente alla fase di configurazione e successivamente a \emph{true} una volta avviata la fase di run della Dashboard. Per ovviare a questo problema abbiamo aggiunto una responsabilità al nostro servizio con il compito di notificare agli widget caricati nella dashboard, che un determinato widget é stato selezionato attraverso il Dial e contemporaneamente all'emissione dell'evento conservare l'id dello stesso al suo interno.
 
-\vspace{1.0cm}
+\vspace{0.5cm}
 \begin{lstlisting}[caption={Notifica selezione Widget e salvataggio id},style=javaScriptCode]
     public currentWidget: string;
     public onWidgetSelected = new EventEmitter<string>();
@@ -346,7 +346,7 @@ Inizialmente abbiamo riscontrato che la dashboard non tiene traccia di quale Wid
         this.onWidgetSelected.emit(this.currentWidget);
     }
 \end{lstlisting} 
-\vspace{1.0cm}
+\vspace{0.5cm}
 
 In questo modo, ogni qualvolta un widget viene selezionato, il servizio notifica a tutti gli widget presenti nella dashboard che é avvenuta un'acquisizione, delegando agli stessi il compito di verificare se la medesima selezione emessa contiene l'identificatore a loro associato. Qualora il widget riscontrasse che la stringa emessa non corrisponde al suo id, effettua l'\emph{unsubscribe} agli eventi di notifica delle azioni emesse dal Dial se presenti.
 
@@ -426,6 +426,7 @@ public async void ItemInvoked(DialMenuItem item)
 \end{lstlisting} 
 \vspace{1.0cm}
 
+\newpage
 \subsection{Variazione degree personalizzata}
 Uno dei problemi principali per gli utilizzatori della dashboard per il testing di motori era la presenza di un moltiplicatore statico per i potenziometri presenti nella pulsantiera, ciò comporta un notevole svantaggio per il cambiamento di variabili con unità di misura diverse e  soprattutto con differenti scale di misura, come ad esempio la variazione del numero di giri di un motore, espresso in \textbf{RPM} dove ogni step equivale a 1000 giri al minuto, a differenza del valore della coppia espressa in \textbf{N/m} la quale necessita di un fondo scale differente, per questo abbiamo pensato di inserire un moltiplicatore dinamico all'interno del widget che permette di cambiare il valore del singolo tick del Dial, consentendo così di eseguire una modifica più rapida dei dati, personalizzata per lo specifico widget.
 Inizialmente l'idea era di inserire un parametro in fase di configurazione per decidere a priori il valore del moltiplicatore, me rimanendo comunque in parte statico abbiamo optato per una variazione a dashboard avviata.

@@ -214,7 +214,7 @@
   {Laureandi \hfill Relatore \par}%
   {\bfseries \large \@theauthor \hfill \@theadvisor \par}%
   {\small Matricola \@thematricola \hfill \ \par}%
-  \vspace{0.25cm}%
+  \vspace{0.8cm}%
   {\bfseries \large Michele Benedetti \hfill \ \par}%
   {\small Matricola 100888 \hfill \ \par}%
 \end{center}
